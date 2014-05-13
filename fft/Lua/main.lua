@@ -24,9 +24,20 @@ end
 function fft_intensity(data)
     ret = {}
     for x = 1, 1024 do
-        ret[x] = math.sqrt(math.pow(data[x][1], 2) + math.pow(data[x][2], 2))/20
+        ret[x] = math.pow(data[x][1], 2) + math.pow(data[x][2], 2)
     end
     return ret
+end
+
+function normalise(data)
+    k = math.max(unpack(data,5))
+    if (k ~= 0) then
+        for x=1,1024 do
+            data[x] = data[x]/k
+            data[x] = data[x]*256
+        end
+    end
+    return data
 end
 
 -- its like main, but worse
@@ -46,7 +57,7 @@ function love.draw()
         love.graphics.line(i+0, data[i], i+1, data[i+1])
     end
     ret = fft(data, false)
-    vals = fft_intensity(ret)
+    vals = normalise(fft_intensity(ret))
     for i = 2, 512 do
         --io.write(vals[i], "\n")
         yval = 512 - vals[i]

@@ -62,7 +62,7 @@ def main():
         pointlist = zip(xs,ys)
         pygame.draw.lines(screen, RED, False, pointlist)
 
-        ys_fft = abs(rfft(ys))[1:]
+        ys_fft = (abs(rfft(ys))[1:])**2
         k = max(ys_fft)
         if k:
             ys_fft = map(lambda x: int(x/k*256), ys_fft)
