@@ -81,8 +81,8 @@ int main(void) {
 
         fftw_execute(p);
         for(i = 0; i < NUM_DOTS/DIV; i++) {
-            draw_output[i] = sqrt(fft_out[i][1] * fft_out[i][1] +
-                    fft_out[i][0] * fft_out[i][0]);
+            draw_output[i] = fft_out[i][1] * fft_out[i][1] +
+                    fft_out[i][0] * fft_out[i][0];
         }
 
         if (norm){
