@@ -25,6 +25,7 @@ implementation the most explanatory.
 ### Implementations
 - C - two implementations, one uses kiss\_fft and the other uses fftw, both use
 SDL for graphics
+- C now has a (bad) OpenGL implementation using fftw
 - Python - two implementations, one uses pygame and the other uses pyglet.
 Both of the implementations use the same FFT library, numpy.
 The pyglet implementation is currently unfinished (purely because the OpenGL

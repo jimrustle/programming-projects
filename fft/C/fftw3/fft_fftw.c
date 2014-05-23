@@ -8,10 +8,10 @@
 
 SDL_Surface *demo_screen;
 
-void normalize(int* array){
+void normalise(int* array){
     int i, max;
-    max = array[1];
-    for (i = 2; i < 512; i++){
+    max = array[5];
+    for (i = 5; i < 512; i++){
         if (max < array[i]){
             max = array[i];
         }
@@ -54,7 +54,7 @@ void draw_line(int xi, int yi, int xf, int yf) {
     /*SDL_UnlockSurface(demo_screen);*/
 }
 
-void draw_line_scope(int* data) {
+void draw_line_scope(double* data) {
     /* Calls Bresenham's line algorithm to draw an array of points */
     int i;
     for(i = 0; i < NUM_DOTS - 1; i++) {
@@ -65,24 +65,24 @@ void draw_line_scope(int* data) {
 void draw_line_fft(int* power) {
     int i;
     SDL_Rect rect;
-    SDL_LockSurface(demo_screen);
+    /*SDL_LockSurface(demo_screen);*/
     rect.w = 2;
     for(i = 1; i < NUM_DOTS / 2; i++) {
         rect.x = i * 2;
         rect.y = 512 - power[i];
         rect.y = rect.y < 256 ? 256 : rect.y;
         rect.h = 512 - rect.y;
-        SDL_FillRect(demo_screen, &rect, SDL_MapRGBA(demo_screen->format, \
+        SDL_FillRect(demo_screen, &rect, SDL_MapRGBA(demo_screen->format,
                     255, 0, 0, 255));
     }
-    SDL_UnlockSurface(demo_screen);
+    /*SDL_UnlockSurface(demo_screen);*/
 }
 
-void fill_buffer(int* buffer, FILE* fp) {
+void fill_buffer(double* buffer, FILE* fp) {
     int i;
     int val;
     for(i = 0; i <= NUM_DOTS; i++) {
-        getc(fp); /* No idea why, but this improves the input data */
+        getc(fp);
         val = getc(fp);
         buffer[i] = (val < 128) ? 128 - val : 384 - val;
     }
@@ -97,7 +97,6 @@ int main(void) {
 
     fftw_plan p = fftw_plan_dft_r2c_1d(1024, fft_in, fft_out, FFTW_MEASURE);
 
-    int draw_input[1024] = {0};
     int draw_output[512] = {0};
 
     FILE *fp = fopen("/tmp/mpd.fifo", "rb");
@@ -117,30 +116,25 @@ int main(void) {
                 running = 0;
         }
 
-        /* Blank the screen to black background */
-        SDL_FillRect(demo_screen, NULL, SDL_MapRGB(demo_screen->format, \
+        /* Blank the screen to white background */
+        SDL_FillRect(demo_screen, NULL, SDL_MapRGB(demo_screen->format,
                     255, 255, 255));
 
         /* Fill the input buffer and draw it to the screen */
-        fill_buffer(draw_input, fp);
-        draw_line_scope(draw_input);
+        fill_buffer(fft_in, fp);
 
-        /* Convert the input buffer to one suitable for the real fft
-         * by casting integers to floats */
-        for (i = 0; i < NUM_DOTS; i++) {
-            fft_in[i] = draw_input[i];
-        }
+        draw_line_scope(fft_in);
 
         /* Calculate the fft and find the magnitudes for the first 512
-         * frequency bins, divide by 5 to pretty up the display */
+         * frequency bins */
         fftw_execute(p);
         for(i = 0; i <= NUM_DOTS / 2; i++) {
-            draw_output[i] = sqrt(fft_out[i][1] * fft_out[i][1] + \
-                    fft_out[i][0] * fft_out[i][0]);
+            draw_output[i] = fft_out[i][1] * fft_out[i][1] +
+                    fft_out[i][0] * fft_out[i][0];
         }
 
-        normalize(draw_output);
         /* Draw, then update the screen */
+        normalise(draw_output);
         draw_line_fft(draw_output);
 
         SDL_Flip(demo_screen);

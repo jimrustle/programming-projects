@@ -1,0 +1,47 @@
+0a1,5
+> /*
+>  * SDL FFT Spectrum Audio Display
+>  * 30 March 2014
+>  */
+> 
+5a11,12
+> #include <kiss_fft.h>
+> #include <kiss_fftr.h>
+7d13
+< #include <fftw3.h>
+57c63
+< void draw_line_scope(double* data) {
+---
+> void draw_line_scope(int* data) {
+81c87
+< void fill_buffer(double* buffer, FILE* fp) {
+---
+> void fill_buffer(int* buffer, FILE* fp) {
+95,98c101,103
+<     double fft_in[1024] = {};
+<     fftw_complex fft_out[1024] = {{0}};
+< 
+<     fftw_plan p = fftw_plan_dft_r2c_1d(1024, fft_in, fft_out, FFTW_MEASURE);
+---
+>     kiss_fftr_cfg cfg = kiss_fftr_alloc(NUM_DOTS, 0, NULL, NULL);
+>     kiss_fft_scalar fft_input[1024] = {0};
+>     kiss_fft_cpx fft_output[512] = {{0,0}};
+99a105
+>     int draw_input[1024] = {0};
+124c130,131
+<         fill_buffer(fft_in, fp);
+---
+>         fill_buffer(draw_input, fp);
+>         draw_line_scope(draw_input);
+126c133,137
+<         draw_line_scope(fft_in);
+---
+>         /* Convert the input buffer to one suitable for the real kiss_fft
+>          * by casting integers to floats */
+>         for (i = 0; i < NUM_DOTS; i++) {
+>             fft_input[i] = draw_input[i];
+>         }
+130c141
+<         fftw_execute(p);
+---
+>         kiss_fftr(cfg, fft_input, fft_output);

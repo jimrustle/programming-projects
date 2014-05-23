@@ -1,7 +1,7 @@
 CC=/usr/bin/gcc-4.8
-CFLAGS=-Wall -I/usr/include/SDL -std=c99 -I$$HOME/.local/include ./kiss_fft130/kiss_fft.c ./kiss_fft130/tools/kiss_fftr.c
-LDFLAGS=-lm -lSDL
-TARGET=fft_sdl
+CFLAGS=-Wall -I$$HOME/.local/include -I/usr/include/SDL -Ofast
+LDFLAGS=-lm -lfftw3 -lSDL -lGL
+TARGET=fft
 
 all: $(TARGET)
 

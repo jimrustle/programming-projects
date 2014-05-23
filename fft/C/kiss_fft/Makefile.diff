@@ -1,0 +1,6 @@
+2,3c2,3
+< CFLAGS=-Wall -I$$HOME/.local/include -I/usr/include/SDL
+< LDFLAGS=-lm -lfftw3 -lSDL
+---
+> CFLAGS=-Wall -I/usr/include/SDL -I$$HOME/.local/include ./kiss_fft130/kiss_fft.c ./kiss_fft130/tools/kiss_fftr.c
+> LDFLAGS=-lm -lSDL

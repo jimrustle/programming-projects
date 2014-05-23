@@ -1,5 +1,5 @@
 CC=/usr/bin/gcc-4.8
-CFLAGS=-Wall -g -std=c99 -I$$HOME/.local/include -I/usr/include/SDL
+CFLAGS=-Wall -I$$HOME/.local/include -I/usr/include/SDL
 LDFLAGS=-lm -lfftw3 -lSDL
 TARGET=fft_sdl
 
