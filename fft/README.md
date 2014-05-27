@@ -5,15 +5,15 @@ A completely experimental and educational experience (for me, anyway)
 on digital signal processing, graphics, and learning new languages and APIs.
 
 All of the implementations follow the basic idea, they open the named pipe,
-/tmp/mpd.fifo, and read in 2048 bytes from the audio stream. From this input,
-every other byte is dropped, and only the even indexes are kept as data. I
-have no idea why it helps clean out noise from the data, but I think it's a
-problem with my local configuration of MPD. (I have it set to output on 2
-channels, rather than 1)
+/tmp/mpd.fifo, and read in 2048 or bytes individually (!) from the audio
+stream. From this input, every other byte is dropped, and only the even
+indexes are kept as data.
+(This happens in the SDL fft implementations. For the opengl implementation, it
+is *far* faster, as it uses a file descriptor instead)
 
-Anyway, the input data is then drawn to the screen after being shuffled
-through a math function to centre it around 256, and then a FFT is performed
-on the data. Then, this data is drawn to the screen.
+The input data is then drawn to the screen after being shuffled through a math
+function to centre it around 256, and then a FFT is performed on the data.
+Then, this data is drawn to the screen.
 
 In the Python/pygame implementation, I tried to make the FFT display with
 logarithmic bins, just to see what it would look like.
