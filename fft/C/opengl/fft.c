@@ -1,7 +1,10 @@
-#include <time.h>
-#include <stdlib.h>
+#include <unistd.h>
 #include <fftw3.h>
 #include "fft.h"
+
+#include <stdlib.h>
+#include <fcntl.h>
+#include <time.h>
 
 SDL_Surface *demo_screen;
 
@@ -14,10 +17,11 @@ int main(void) {
 
     fftw_plan p = fftw_plan_dft_r2c_1d(NUM_DOTS, fft_in, fft_out, FFTW_MEASURE);
 
-    /*int draw_input[NUM_DOTS] = {0};*/
+    /*unsigned char draw_input[NUM_DOTS] = {0};*/
     int draw_output[NUM_DOTS/DIV] = {0};
 
-    FILE *fp = fopen("/tmp/mpd.fifo", "rb");
+    /*FILE *fp = fopen("/tmp/mpd.fifo", "rb");*/
+    int f = open("/tmp/mpd.fifo", O_RDONLY | O_NONBLOCK);
 
     /* Set up SDL */
 
@@ -53,8 +57,11 @@ int main(void) {
 
     /* Main Loop */
     int running = 1;
-    int norm = 0;
-    int windp = 0;
+    int norm = 1;
+    int windp = 1;
+    int m = 0;
+    int d = 1;
+    int val = 1;
     while(running) {
         /* Catch events */
         while(SDL_PollEvent(&ev)) {
@@ -64,14 +71,14 @@ int main(void) {
             else if(ev.type == SDL_KEYDOWN ) {
                 /* Quit if 'q', change normalise if 'n' */
                 unsigned char key = ev.key.keysym.sym;
-                handle_keys(key, &running, &norm, &windp);
+                handle_keys(key, &running, &norm, &windp, &m, &d, &val);
             }
         }
         /* Blank the screen to white background */
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Fill the input buffer and draw it to the screen */
-        fill_buffer(fft_in, fp);
+        fill_buffer(fft_in, f);
 
         if (windp){
             window(fft_in);
@@ -80,10 +87,16 @@ int main(void) {
         /*draw_line_scope(fft_in);*/
 
         fftw_execute(p);
+        if (m){
         for(i = 0; i < NUM_DOTS/DIV; i++) {
-            draw_output[i] = fft_out[i][1] * fft_out[i][1] +
-                    fft_out[i][0] * fft_out[i][0];
-        }
+            draw_output[i] = 10*log10(fft_out[i][1] * fft_out[i][1] +
+                    fft_out[i][0] * fft_out[i][0]);
+        }}
+        else{
+        for(i = 0; i < NUM_DOTS/DIV; i++) {
+            draw_output[i] = sqrt(fft_out[i][1] * fft_out[i][1] +
+                    fft_out[i][0] * fft_out[i][0]);
+        }}
 
         if (norm){
             normalize(draw_output);
@@ -93,10 +106,14 @@ int main(void) {
         draw_line_fft(draw_output);
 
         SDL_GL_SwapBuffers();
+        if (d){
+        SDL_Delay(val);
+        }
     }
 
     SDL_Quit();
-    fclose(fp);
+    /*fclose(fp);*/
+    close(f);
     printf("Program quit.\n");
     return 0;
 }

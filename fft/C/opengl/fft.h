@@ -4,6 +4,10 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <math.h>
+
+#include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
 extern SDL_Surface *demo_screen;
 
 void window(double* data){
@@ -66,22 +70,48 @@ void draw_line_fft(int* power) {
     }
 }
 
-void fill_buffer(double* buffer, FILE* fp) {
-    int i;
-    int val;
-    for(i = 0; i < NUM_DOTS; i++) {
-        getc(fp); /* Causes noticeable slowdown */
-        val = getc(fp);
-        buffer[i] = (val < 128) ? 128 - val : 384 - val;
+void fill_buffer(double* buffer, int fp) {
+    int16_t buf[2*NUM_DOTS] = {0};
+
+    read(fp, buf, sizeof(buf));
+
+    ssize_t i;
+    for (i = 0; i < 2*NUM_DOTS; i+=2){
+        buffer[i] = buf[i];
     }
+
+    //unsigned char tmp[NUM_DOTS*2];
+    //fread(tmp, sizeof(unsigned char), 2*NUM_DOTS, fp);
+
+    //int i;
+    //for (i = 1; i < NUM_DOTS; i++){
+        //double value = tmp[2*i];
+        //buffer[i] = (value < 128) ? 128 - value : 384 - value;
+        ////buffer[i] = (double) tmp[2*i];
+    //}
 }
 
-void handle_keys(unsigned char key, int* running, int* norm, int* windp){
+void handle_keys(unsigned char key, int* running, int* norm, int* windp,
+        int* m, int* d, int* val){
     *running = !(key == 'q');
     if (key == 'n'){
         *norm = !*norm;
     }
     else if (key == 'w'){
         *windp = !*windp;
+    }
+    else if (key == 'm'){
+        *m = !*m;
+    }
+    else if (key == 'd'){
+        *d = !*d;
+    }
+    else if (key == 'k'){
+        *val += 1;
+    }
+    else if (key == 'j'){
+        if (*val > 2){
+        *val -= 1;
+        }
     }
 }
