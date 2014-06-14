@@ -32,6 +32,11 @@
     (lambda (letter) (string-equal letter guess))
     word))
 
+(defun update-num-guesses (letter string num-guesses)
+  (if (find letter string :test #'string-equal)
+      num-guesses
+      (- num-guesses 1)))
+
 ; function to print the unknown word in the style of hangman
 ; (print-word '(F T F T T) "MOUSE" ) -> "_O_SE"
 (defun print-word (status word)
@@ -51,22 +56,33 @@
   (format t "You win! ~%")
   (format t "The word was ~a ~%" word))
 
-; define game words
-(defvar *guess-word* (random-word *wordlist*))
-(defvar *status* (word-check " " *guess-word*))
+(defun lose-game (word)
+  (format t "You lose! ~%")
+  (format t "The word was ~a ~%" word))
 
 ; function to update the status
-(defun update-status (status)
-  (let ((update-word (mapcar (lambda (x y) (or x y)) *status* status)))
-  (setq *status* update-word)))
+(defun update-status (old-status new-status)
+  (mapcar (lambda (x y) (or x y)) old-status new-status))
+
+(defun game-loop (word old-status num-guesses)
+  (if (= num-guesses 0)
+      (lose-game word)
+      (progn
+        (print-word old-status word)
+        (format t "Number of guesses left: ~a ~%" num-guesses)
+        (format t "Enter a letter: ~%")
+        (let* ((guessed-letter (read))
+               (entered-status (word-check guessed-letter word))
+               (new-status (update-status old-status entered-status))
+               (new-num-guesses (update-num-guesses guessed-letter word num-guesses)))
+          (cond ((hangman-wonp new-status) (won-game word))
+                (t (game-loop word new-status new-num-guesses)))))))
 
 ; game main loop
 (defun main-game ()
-  (print-word *status* *guess-word*)
-  (format t "Enter a letter: ~%")
-  (let ((guessed-letter (read)))
-    (update-status (word-check guessed-letter *guess-word*)))
-  (cond ((hangman-wonp *status*) (won-game *guess-word*))
-        (t (main-game))))
+  (let* ((guess-word (random-word *wordlist*))
+         (status (word-check " " guess-word)))
+    (game-loop guess-word status 5)))
 
 (main-game)
+
