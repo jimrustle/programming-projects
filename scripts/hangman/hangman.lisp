@@ -2,13 +2,10 @@
 ; Babby's First Lisp Program
 ;
 ; TODO:
-;  * Store the player's guesses and implement a lose option, as right
-;    now, it's just "guess-the-word" instead of hangman
-;  * Think harder and store the word to guess and the status as a local
-;    variable
 ;  * Improve indenting style (?)
 ;  * Find out how to clear the terminal (dirty hack: print 24 new lines)
-;  * Implement a repeat-game loop and prompt the user when to quit
+;  * Implement a repeat-game loop and prompt the user when to quit or
+;    play again
 ;
 
 (setf *random-state* (make-random-state t))
