@@ -32,6 +32,8 @@ The pyglet implementation is currently unfinished (purely because the OpenGL
 book is so difficult to read).
 - Lua - uses LÖVE 0.9.0 and luafft
 - Scheme - in the works, planning to use guile-2d and a currently undecided fft library
+- Matlab for shits n' giggles, the five-line, five-minute implementation
+for fun
 
 ### Benchmarks
 I thought it would be nice to include (completely non-scientific) CPU loads

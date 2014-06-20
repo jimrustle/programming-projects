@@ -27,3 +27,7 @@ To run, run the Python interpreter on the file.
 since LuaRocks didn't want to play nicely and install anything
 
 To run, run ```love .``` in the directory.
+
+# Matlab
+- It\'s actually Octave, but just tap ```C-C```, or ```^C``` to quit
+- Run the interpreter on the file as like any other Matlab/Octave file
