@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <fftw3.h>
+#include <stdlib.h>
+#include <fcntl.h>
+
 extern SDL_Surface *demo_screen;
 
 void window(double* data){

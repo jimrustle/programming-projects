@@ -1,10 +1,4 @@
-#include <unistd.h>
-#include <fftw3.h>
 #include "fft.h"
-
-#include <stdlib.h>
-#include <fcntl.h>
-#include <time.h>
 
 SDL_Surface *demo_screen;
 
@@ -33,7 +27,7 @@ int main(void) {
     if(!demo_screen)
         fprintf(stderr, "Could not set video mode: %s\n", SDL_GetError());
 
-    SDL_WM_SetCaption("MPD Visalizer - Sanic Fast OpenGL Edition", NULL);
+    SDL_WM_SetCaption("MPD Visualiser - Sanic Fast OpenGL Edition", NULL);
 
     /* Set up OpenGL */
     glLoadIdentity();

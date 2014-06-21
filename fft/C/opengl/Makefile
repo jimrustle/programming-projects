@@ -12,4 +12,4 @@ clean:
 	rm -f $(TARGET) $(TARGET).o
 
 .c.o:
-	$(CC) $(CFLAGS) $(LDFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $<
