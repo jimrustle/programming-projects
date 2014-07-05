@@ -7,15 +7,11 @@ did it.
 The dependencies for C include:
 - SDL, as libsdl1.2-dev
 - fftw, as libfftw3-dev
-- kiss\_fft, which was compiled and installed into $HOME/.local/include
-I also left the kiss\_fftr.c and kiss\_fft.c in the same directory as
-the source files as the visualiser. (since I never really learned how
-to compile and link files correctly)
 
-To compile, run make, then ./fft_sdl or ./fft_sdl_fftw.
+To compile, run ```make```, then ```./fft```.
 
 # Python
-- numpy, for the fft
+- numpy, for the FFT and array operations
 - pygame 1.9.1, installed from the package manager
 - pyglet 1.1.4, installed from pip
 
@@ -31,3 +27,7 @@ To run, run ```love .``` in the directory.
 # Matlab
 - It\'s actually Octave, but just tap ```C-C```, or ```^C``` to quit
 - Run the interpreter on the file as like any other Matlab/Octave file
+
+# Lisp
+- quicklisp "lispbuilder-sdl", "bordeaux-fft" and "cl-opengl"
+- Run it through emacs/slime/sbcl

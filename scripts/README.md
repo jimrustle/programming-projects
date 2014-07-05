@@ -1,5 +1,8 @@
 ## Scripts
 
+- game-scripts includes an auto-playing script for the first few levels of a
+Arbcrgf game
+
 - 555timer.py - Script to select the value of resistors and capacitors for a
 desired frequency or period, it's lacking features for high/low time output
 - hangman.py - A simple hangman game

@@ -27,7 +27,7 @@ int main(void) {
     if(!demo_screen)
         fprintf(stderr, "Could not set video mode: %s\n", SDL_GetError());
 
-    SDL_WM_SetCaption("MPD Visualiser - Sanic Fast OpenGL Edition", NULL);
+    SDL_WM_SetCaption("MPD Visalizer - Sanic Fast OpenGL Edition", NULL);
 
     /* Set up OpenGL */
     glLoadIdentity();
@@ -42,7 +42,7 @@ int main(void) {
     glDisable(GL_TEXTURE_1D);
     glDisable(GL_TEXTURE_2D);
     glClearColor( 1.f, 1.f, 1.f, 1.f ); /* White clear/background colour */
-    glOrtho(0, 1024, 512, 0, 0, 1);
+    glOrtho(0, 1024, 0, 512, 0, 1);
 
     GLenum error = glGetError();
     if( error != GL_NO_ERROR ) {
@@ -51,21 +51,22 @@ int main(void) {
 
     /* Main Loop */
     int running = 1;
-    int norm = 1;
-    int windp = 1;
-    int m = 0;
-    int d = 1;
-    int val = 1;
+    int windp = 0;
+    int window_val = 0;
+    int delay = 1;
+    int delay_val = 30;
+    int filterp = 0;
     while(running) {
         /* Catch events */
         while(SDL_PollEvent(&ev)) {
             if(ev.type == SDL_QUIT){
                 running = 0;
             }
-            else if(ev.type == SDL_KEYDOWN ) {
-                /* Quit if 'q', change normalise if 'n' */
+            else if(ev.type == SDL_KEYDOWN) {
+                /* Quit if 'q' */
                 unsigned char key = ev.key.keysym.sym;
-                handle_keys(key, &running, &norm, &windp, &m, &d, &val);
+                handle_keys(key, &running, &windp, &window_val, &delay,
+                        &delay_val, &filterp);
             }
         }
         /* Blank the screen to white background */
@@ -75,39 +76,35 @@ int main(void) {
         fill_buffer(fft_in, f);
 
         if (windp){
-            window(fft_in);
+            window(fft_in, window_val);
         }
+        /*if (filterp){*/
+            /*filter(fft_in);*/
+        /*}*/
 
-        /*draw_line_scope(fft_in);*/
+        draw_line_scope(fft_in);
 
         fftw_execute(p);
-        if (m){
         for(i = 0; i < NUM_DOTS/DIV; i++) {
-            draw_output[i] = 10*log10(fft_out[i][1] * fft_out[i][1] +
-                    fft_out[i][0] * fft_out[i][0]);
-        }}
-        else{
-        for(i = 0; i < NUM_DOTS/DIV; i++) {
-            draw_output[i] = sqrt(fft_out[i][1] * fft_out[i][1] +
-                    fft_out[i][0] * fft_out[i][0]);
-        }}
-
-        if (norm){
-            normalize(draw_output);
+            draw_output[i] =(
+                    sqrt(fft_out[2*i][1] * fft_out[2*i][1] + fft_out[2*i][0] * fft_out[2*i][0]) +
+                    sqrt(fft_out[2*i+1][1] * fft_out[2*i+1][1] + fft_out[2*i+1][0] * fft_out[2*i+1][0]))/2.0;
         }
+
+        /*if (norm){*/
+        normalize(draw_output);
 
         /* Draw, then update the screen */
         draw_line_fft(draw_output);
 
         SDL_GL_SwapBuffers();
-        if (d){
-        SDL_Delay(val);
+        if (delay){
+            SDL_Delay(delay_val);
         }
     }
 
     SDL_Quit();
-    /*fclose(fp);*/
     close(f);
     printf("Program quit.\n");
     return 0;
-}
+    }
