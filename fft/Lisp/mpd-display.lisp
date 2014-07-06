@@ -2,7 +2,7 @@
 (ql:quickload "bordeaux-fft")
 (ql:quickload "cl-opengl")
 
-;(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
+(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
 
 (defparameter *default-colour* sdl:*red*)
 (defparameter *spectro-array* (make-array '(512 512) :element-type '(float)
@@ -14,33 +14,34 @@
 (defun get-signal (file)
   (let ((vector (make-array 1024 :initial-element 0.0 :element-type '(float))))
     (read-sequence vector file)
-    (map 'vector (lambda (x) (+ (floor (/ x 256.0)) 128)) vector)))
+    (map 'vector (lambda (x) (declare (type (signed-byte 16) x))
+                         (+ (floor x 256.0f0) 128)) vector)))
 
-;
 ; Abstract these two normalizations
-;
 (defun normalize (fft-vector)
   (let ((maximum (reduce #'max fft-vector :start 1)))
+    (declare (type double-float maximum))
     (if (< 0 maximum)
-        (map 'vector (lambda (x) (floor (* (/ x maximum) 255))) fft-vector))))
+        (map 'vector (lambda (x) (declare (type double-float x))
+                             (floor (* (/ x maximum) 255))) fft-vector))))
 
 (defun normalize-gl (fft-vector)
   (let ((maximum (reduce #'max fft-vector :start 1)))
-    (if (< 0.0 maximum)
-        (map 'vector (lambda (x) (- 1 (/ x maximum))) fft-vector))))
+    (declare (type double-float maximum))
+    (if (< 0 maximum)
+        (map 'vector (lambda (x) (declare (type double-float x))
+                             (- 1.0d0 (/ x maximum))) fft-vector))))
 
 (defun make-fft-vec (signal-vector)
   (map 'vector #'abs (bordeaux-fft:sfft signal-vector)))
 
-; Can this be optimized?
 (defun shift-spectrogram (array)
-  (do ((i 1 (1+ i))) ((= i 512))
-    (dotimes (n 512)
-      (setf (aref array (1- i) n) (aref array i n)))))
+  (do-i-range 512 (1+ i) (= i (* 512 512))
+    (setf (row-major-aref array (- i 512)) (row-major-aref array i))))
 
 (defun fill-end-spectrogram-fft (array signal)
-  (dotimes (i 512)
-    (setf (aref array 511 i) (aref signal i))))
+ (dotimes (i 512)
+   (setf (row-major-aref array (+ i 261632)) (aref signal i))))
 
 (defun draw-spectro-gl (array)
   (dotimes (x 512)
@@ -88,12 +89,14 @@
         (:idle ()
                (gl:clear :color-buffer-bit)
                (gl:color 0 0 0)
-               (draw-line-gl (get-signal mpd-file))
-               (draw-fft-gl (normalize (make-fft-vec (get-signal mpd-file))))
-               (shift-spectrogram *spectro-array*)
-               (fill-end-spectrogram-fft *spectro-array*
-                                         (normalize-gl
-                                         (make-fft-vec (get-signal mpd-file))))
+               (let* ((sig (get-signal mpd-file))
+                      (fft (make-fft-vec sig)))
+                 (draw-line-gl sig)
+                 (draw-fft-gl (normalize fft))
+                 (shift-spectrogram *spectro-array*)
+                 (fill-end-spectrogram-fft *spectro-array*
+                                           (normalize-gl
+                                           fft)))
                (draw-spectro-gl *spectro-array*)
                (gl:flush)
                (sdl:update-display))))))
