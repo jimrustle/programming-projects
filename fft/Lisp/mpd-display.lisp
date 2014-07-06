@@ -2,10 +2,11 @@
 (ql:quickload "bordeaux-fft")
 (ql:quickload "cl-opengl")
 
-;(proclaim '(optimize (speed 0) (safety 3) (debug 3)))
+;(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
 
 (defparameter *default-colour* sdl:*red*)
-(defparameter *spectro-array* (make-array '(256 512) :initial-element 0.0f0))
+(defparameter *spectro-array* (make-array '(512 512) :element-type '(float)
+                                          :initial-element 1.0f0))
 
 (defmacro do-i-range (start increment end &rest body)
   `(do ((i ,start ,increment)) (,end) ,@body))
@@ -26,29 +27,31 @@
 (defun normalize-gl (fft-vector)
   (let ((maximum (reduce #'max fft-vector :start 1)))
     (if (< 0.0 maximum)
-        (map 'vector (lambda (x) (- 1.0 (/ x maximum))) fft-vector))))
+        (map 'vector (lambda (x) (- 1 (/ x maximum))) fft-vector))))
 
 (defun make-fft-vec (signal-vector)
   (map 'vector #'abs (bordeaux-fft:sfft signal-vector)))
 
 ; Can this be optimized?
 (defun shift-spectrogram (array)
-  (do ((i 1 (1+ i))) ((= i 256))
+  (do ((i 1 (1+ i))) ((= i 512))
     (dotimes (n 512)
       (setf (aref array (1- i) n) (aref array i n)))))
 
 (defun fill-end-spectrogram-fft (array signal)
   (dotimes (i 512)
-    (setf (aref array 255 i) (aref signal i))))
+    (setf (aref array 511 i) (aref signal i))))
 
 (defun draw-spectro-gl (array)
-  (dotimes (x 255)
+  (dotimes (x 512)
     (gl:with-primitives :quad-strip
       (dotimes (y 255)
-        (let ((colour (aref array x (1+ y))))
+        (let ((colour (aref array x (1+ y)))
+              (y (+ 255 y)))
+          (declare (type float colour))
           (gl:color colour colour colour)
           (gl:vertex x y)
-          (gl:vertex x y))))))
+          (gl:vertex (1+ x) y))))))
 
 (defun draw-line-gl (signal-vector)
   (gl:with-primitives :line-strip
@@ -88,9 +91,9 @@
                (draw-line-gl (get-signal mpd-file))
                (draw-fft-gl (normalize (make-fft-vec (get-signal mpd-file))))
                (shift-spectrogram *spectro-array*)
-                (fill-end-spectrogram-fft *spectro-array*
-                                          (normalize-gl
-                                           (make-fft-vec (get-signal mpd-file))))
-                (draw-spectro-gl *spectro-array*)
+               (fill-end-spectrogram-fft *spectro-array*
+                                         (normalize-gl
+                                         (make-fft-vec (get-signal mpd-file))))
+               (draw-spectro-gl *spectro-array*)
                (gl:flush)
                (sdl:update-display))))))

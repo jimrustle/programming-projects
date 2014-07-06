@@ -1,5 +1,7 @@
 ## MPD audio displays
 
+![Lisp MPD Visualizer](fft.png "Lisp MPD Visualizer")
+
 ### Write-up
 A completely experimental and educational experience (for me, anyway)
 on digital signal processing, graphics, and learning new languages and APIs.
