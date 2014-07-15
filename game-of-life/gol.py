@@ -59,16 +59,34 @@ for i in range(SIZE):
     for j in range(SIZE):
         lifearray.append(0)
 
-lifearray[5] = 1
-lifearray[25]= 1
-lifearray[45] = 1
+#lifearray[5] = 1
+#lifearray[25]= 1
+#lifearray[45] = 1
 
 #lifearray[9] = 1
 #lifearray[10] = 1
 #lifearray[16] = 1
 #lifearray[17] = 1
 
+# lol excuse this
+lifearray[89] = 1
+lifearray[90] = 1
+lifearray[91] = 1
+lifearray[93] = 1
+lifearray[109] = 1
+lifearray[132] = 1
+lifearray[133] = 1
+lifearray[150] = 1
+lifearray[151] = 1
+lifearray[153] = 1
+lifearray[169] = 1
+lifearray[171] = 1
+lifearray[173] = 1
 
-print_array(lifearray)
-print_array(next_state(lifearray))
-print_array(next_state(next_state(lifearray)))
+running = 1
+while running:
+    inp = raw_input("Press carriage return / enter, q to quit")
+    if inp == 'q':
+        break
+    print_array(lifearray)
+    lifearray = next_state(lifearray)
