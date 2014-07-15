@@ -9,21 +9,21 @@ def shiftdown(array):
     return old + k[:42]
 
 def shiftleft(array):
-    k = list(array)
-    old = k[:49:7]
-    for i in range(7):
-        for j in range(6):
-            k[7*i+j] = k[7*i+j+1]
-        k[7*i+6] = old[i]
+    k = [0]*49
+    old = array[0:49:7]
+    for i in range(0, 48):
+            k[i] = array[i+1]
+    for i in range(6, 49, 7):
+        k[i] = old[i/7]
     return k
 
 def shiftright(array):
-    k = list(array)
-    old = k[6:49:7]
-    for i in range(6, -1, -1):
-        for j in range(6, -1, -1):
-            k[7*i+j] = k[7*i+j-1]
-        k[7*i] = old[i]
+    k = [0]*49
+    old = array[6:49:7]
+    for i in range(1, 49):
+            k[i] = array[i-1]
+    for i in range(0, 49, 7):
+        k[i] = old[i/7]
     return k
 
 def add(a, b, c, d, e, f, g, h):
@@ -32,21 +32,6 @@ def add(a, b, c, d, e, f, g, h):
         k[i] = a[i] + b[i] + c[i] + d[i] \
                + e[i] + f[i] + g[i] + h[i]
     return k
-
-lifearray = []
-
-for i in range(1, 8):
-    for j in range(7):
-        lifearray.append(0)
-
-lifearray[5] = 1
-lifearray[12]= 1
-lifearray[19] = 1
-
-#lifearray[9] = 1
-#lifearray[10] = 1
-#lifearray[16] = 1
-#lifearray[17] = 1
 
 def next_state(current):
     k = add(shiftup(current), \
@@ -65,6 +50,22 @@ def print_array(a):
             print a[7*i+j],
         print
     print "---"
+
+lifearray = []
+
+for i in range(1, 8):
+    for j in range(7):
+        lifearray.append(0)
+
+lifearray[5] = 1
+lifearray[12]= 1
+lifearray[19] = 1
+
+#lifearray[9] = 1
+#lifearray[10] = 1
+#lifearray[16] = 1
+#lifearray[17] = 1
+
 
 print_array(lifearray)
 print_array(next_state(lifearray))
