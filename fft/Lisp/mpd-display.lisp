@@ -2,7 +2,8 @@
 (ql:quickload "bordeaux-fft")
 (ql:quickload "cl-opengl")
 
-(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
+;(proclaim '(optimize (speed 3) (safety 0) (debug 0)))
+(declaim (optimize (speed 3) (safety 0) (debug 0)))
 
 (defparameter *default-colour* sdl:*red*)
 (defparameter *spectro-array* (make-array '(512 512) :element-type '(float)
@@ -17,32 +18,45 @@
     (map 'vector (lambda (x) (declare (type (signed-byte 16) x))
                          (+ (floor x 256.0f0) 128)) vector)))
 
-; Abstract these two normalizations
+(declaim (ftype (function ((simple-array float (512))) (simple-array float (512)))
+                normalize))
 (defun normalize (fft-vector)
   (let ((maximum (reduce #'max fft-vector :start 1)))
     (declare (type double-float maximum))
     (if (< 0 maximum)
         (map 'vector (lambda (x) (declare (type double-float x))
-                             (floor (* (/ x maximum) 255))) fft-vector))))
+                             (/ x maximum)) fft-vector)
+        fft-vector)))
 
-(defun normalize-gl (fft-vector)
-  (let ((maximum (reduce #'max fft-vector :start 1)))
-    (declare (type double-float maximum))
-    (if (< 0 maximum)
-        (map 'vector (lambda (x) (declare (type double-float x))
-                             (- 1.0d0 (/ x maximum))) fft-vector))))
+(declaim (ftype (function ((simple-array float (512))) (simple-array float (512)))
+                fft-modify))
+(defun fft-modify (fft-vector)
+  (map 'vector (lambda (x) (declare (type integer x))
+                          (floor x 0.00392568f0)) fft-vector))
 
+(declaim (ftype (function ((simple-array float (512))) (simple-array float (512)))
+                spectro-modify))
+(defun spectro-modify (fft-vector)
+  (map 'vector (lambda (x) ;(declare (type float x))
+                       (- 1.0d0 x)) fft-vector))
+
+(declaim (ftype (function ((simple-array float (1024))) (simple-array float (512)))
+                make-fft-vec))
 (defun make-fft-vec (signal-vector)
   (map 'vector #'abs (bordeaux-fft:sfft signal-vector)))
 
+(declaim (ftype (function ((simple-array float (512 512)))) shift-spectrogram))
 (defun shift-spectrogram (array)
   (do-i-range 512 (1+ i) (= i (* 512 512))
     (setf (row-major-aref array (- i 512)) (row-major-aref array i))))
 
+(declaim (ftype (function ((simple-array float (512 512)) (simple-array float (512))))
+                fill-end-spectrogram-fft))
 (defun fill-end-spectrogram-fft (array signal)
  (dotimes (i 512)
    (setf (row-major-aref array (+ i 261632)) (aref signal i))))
 
+(declaim (ftype (function ((simple-array float (512 512)))) draw-spectro-gl))
 (defun draw-spectro-gl (array)
   (dotimes (x 512)
     (gl:with-primitives :quad-strip
@@ -54,11 +68,13 @@
           (gl:vertex x y)
           (gl:vertex (1+ x) y))))))
 
+(declaim (ftype (function ((simple-array float (1024)))) draw-line-gl))
 (defun draw-line-gl (signal-vector)
   (gl:with-primitives :line-strip
     (dotimes (i 1024)
       (gl:vertex i (aref signal-vector i)))))
 
+(declaim (ftype (function ((simple-array float (1024)))) draw-line-gl))
 (defun draw-fft-gl (draw-fft-vector)
   (do-i-range 1 (1+ i) (= i 256)
               (let ((y (+ 256 (aref draw-fft-vector i))))
@@ -88,15 +104,13 @@
                            (close mpd-file)))
         (:idle ()
                (gl:clear :color-buffer-bit)
-               (gl:color 0 0 0)
+               (gl:color 255 0 0)
                (let* ((sig (get-signal mpd-file))
-                      (fft (make-fft-vec sig)))
+                      (fft (normalize (make-fft-vec sig))))
                  (draw-line-gl sig)
-                 (draw-fft-gl (normalize fft))
+                 (draw-fft-gl (fft-modify fft))
                  (shift-spectrogram *spectro-array*)
-                 (fill-end-spectrogram-fft *spectro-array*
-                                           (normalize-gl
-                                           fft)))
+                 (fill-end-spectrogram-fft *spectro-array* (spectro-modify fft)))
                (draw-spectro-gl *spectro-array*)
                (gl:flush)
                (sdl:update-display))))))
