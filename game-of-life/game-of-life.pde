@@ -1,12 +1,3 @@
-/*
- * Any live cell with fewer than two live neighbours dies, as if caused by
- * under-population.
- * Any live cell with two or three live neighbours lives on to the next generation.
- * Any live cell with more than three live neighbours dies, as if by overcrowding.
- * Any dead cell with exactly three live neighbours becomes a live cell, as
- * if by reproduction.
- */
-
 static final int SIZE = 20;
 int[] life = new int[SIZE*SIZE];
 
@@ -87,15 +78,19 @@ int[] add_arrays(int a[], int b[], int c[], int d[],
 
 int[] next_state(int old[]){
   int[] next = new int[SIZE*SIZE];
+  int[] left = new int[SIZE*SIZE];
+  int[] right = new int[SIZE*SIZE];
+  left = shiftleft(old);
+  right = shiftright(old);
 
   next = add_arrays(shiftup(old),
       shiftdown(old),
-      shiftleft(old),
-      shiftright(old),
-      shiftup(shiftleft(old)),
-      shiftup(shiftright(old)),
-      shiftdown(shiftleft(old)),
-      shiftdown(shiftright(old)));
+      left,
+      right,
+      shiftup(left),
+      shiftup(right),
+      shiftdown(left),
+      shiftdown(right));
 
   for (int i = 0; i < SIZE*SIZE; i++) {
     if (((old[i] == 1) && (next[i] == 2)) || (next[i] == 3)) {
@@ -110,7 +105,8 @@ int[] next_state(int old[]){
 }
 
 void setup() {
-  rectMode(RADIUS);
+  //rectMode(RADIUS);
+  rectMode(CENTER);
   frameRate(5);
   size(735, 735);
   background (0, 0, 0);
@@ -141,7 +137,8 @@ void draw() {
         fill(255, 255, 255);
       }
 
-      ellipse(35+35*j, 35*i+35, 35, 35);
+      //ellipse(35+35*j, 35*i+35, 35, 35);
+      rect(35+35*j, 35*i+35, 35, 35);
     }
   }
   life = next_state(life);
