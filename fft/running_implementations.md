@@ -5,7 +5,8 @@ did it.
 
 # C
 The dependencies for C include:
-- SDL, as libsdl1.2-dev
+- ~~SDL, as libsdl1.2-dev~~
+- glfw, as libglfw2, as of 26 August
 - fftw, as libfftw3-dev
 
 To compile, run ```make```, then ```./fft```.
@@ -25,7 +26,8 @@ since LuaRocks didn't want to play nicely and install anything
 To run, run ```love .``` in the directory.
 
 # Matlab
-- It\'s actually Octave, but just tap ```C-C```, or ```^C``` to quit
+- It's actually Octave, but just tap ```C-C```, or ```^C``` to quit
+- It doesn't quit correctly (won't fix)
 - Run the interpreter on the file as like any other Matlab/Octave file
 
 # Lisp
