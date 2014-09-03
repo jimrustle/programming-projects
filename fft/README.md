@@ -22,12 +22,13 @@ fully complete.
 - Python - two implementations, one uses pygame and the other uses pyglet.
 Both of the implementations use the same FFT library, numpy.
 The pyglet implementation is currently unfinished, out of laziness
-- Lua - uses LÖVE 0.9.0 and luafft
+- Lua - ~~uses LÖVE 0.9.0 and luafft~~
+uses luajit-glfw and luajit-fftw3
 - Commmon Lisp - cl-opengl and lispbuilder-sdl
 - Scheme - in the works, planning to use guile-2d and a currently undecided fft library
 - Matlab for fun (warning: major bugs)
 
 # Licensing
 Public domain.
-C implementation should be GPL2 as it uses FFTW.
+C and Lua implementations should be GPL2 as it uses FFTW.
 
