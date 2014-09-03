@@ -1,6 +1,6 @@
 #define NUM_DOTS 1024
 
-#include <GL/glfw.h>
+#include <GLFW/glfw3.h>
 
 #include <math.h>
 #include <fftw3.h>
@@ -9,6 +9,44 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+extern GLFWwindow* window;
+int running = 200;
+
+static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == 'Q') {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+}
+
+void init()
+{
+    glfwInit();
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    window = glfwCreateWindow(1024, 512, "MPD Visualizer", NULL, NULL);
+
+    glfwSetKeyCallback(window, key);
+    glfwMakeContextCurrent(window);
+
+    //glfwSwapInterval(1);
+    glLoadIdentity();
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DITHER);
+    glDisable(GL_FOG);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LOGIC_OP);
+    glDisable(GL_STENCIL_TEST);
+    glDisable(GL_TEXTURE_1D);
+    glDisable(GL_TEXTURE_2D);
+
+    /* Background to black */
+    glClearColor(1.f, 1.f, 1.f, 0.f);
+    glOrtho(0, 1024, 0, 512, 0, 1);
+}
+
 
 void draw_spec_line(int x, double *array)
 {
