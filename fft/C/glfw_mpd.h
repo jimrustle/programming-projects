@@ -126,7 +126,7 @@ void draw_line_fft(double* power)
 {
     int i;
     int val;
-    for (i = 1; i < NUM_DOTS/2; i++) {
+    for (i = 1; i < NUM_DOTS/4; i++) {
         val = power[i]/20.0;
         val = fmin(val, 256);
         draw_rect(2*i, val);

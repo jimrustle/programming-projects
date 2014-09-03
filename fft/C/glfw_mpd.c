@@ -56,7 +56,7 @@ int main()
         int x;
         for (x = 0; x < 512; x++) {
             int address = (start+x)*256;
-            address %= 256*511;
+            address %= 256*512;
             draw_spec_line(x, &outputs[address]);
         }
 
