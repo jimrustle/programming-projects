@@ -1,4 +1,9 @@
-#include "mpd.h"
+#include "constants.h"
+#include "drawing.h"
+#include "reading.h"
+
+#include <fftw3.h>
+#include <cmath>
 
 GLFWwindow* window;
 
@@ -44,5 +49,5 @@ int main(void)
     fclose(fp);
 
     printf("Program quit.\n");
-    exit(EXIT_SUCCESS);
+    return 0;
 }

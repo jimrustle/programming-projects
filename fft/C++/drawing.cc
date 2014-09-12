@@ -1,19 +1,14 @@
-#define NUM_DOTS 1024
-
+#include "constants.h"
 #include <GLFW/glfw3.h>
 
-#include <math.h>
-#include <fftw3.h>
-
-#include <stdint.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <vector>
+#include <cmath>
+#include <deque>
+#include <algorithm>
 
 extern GLFWwindow* window;
-int running = 200;
 
-static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
+void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == 'Q') {
         glfwSetWindowShouldClose(window, GL_TRUE);
@@ -47,56 +42,7 @@ void init()
     glOrtho(0, 1024, 0, 512, 0, 1);
 }
 
-
-void draw_spec_line(int x, double *array)
-{
-    int y;
-    glBegin(GL_QUAD_STRIP); /* Top left, bottom left, bottom right, top right */
-
-    for (y = 0; y < 256; y++) {
-        double colorval = array[y];
-        colorval = 1 - colorval;
-        glColor3f(colorval, colorval, colorval);
-        int y_pos = y + 256;
-        glVertex2f(x, y_pos);
-        glVertex2f(x+1, y_pos);
-    }
-
-    glEnd();
-}
-
-void normalize(double *array)
-{
-    int i;
-    double max;
-    max = array[1];
-
-    for (i = 1; i < 256; i++) {
-        if (max < array[i]) {
-            max = array[i];
-        }
-    }
-
-    if (max > 0) {
-        for (i = 1; i < 256; i++) {
-            array[i] = array[i]/max;
-        }
-    }
-}
-
-void fill_buffer(double *buffer, FILE* fp)
-{
-    int16_t buf[NUM_DOTS] = {0};
-    fread(buf, sizeof(int16_t), NUM_DOTS, fp);
-
-    ssize_t i;
-
-    for (i = 0; i < NUM_DOTS; i++) {
-        buffer[i] = (buf[i] >> 8) + 128.0;
-    }
-}
-
-void draw_line_scope(double* data)
+void draw_line_scope(std::vector<double> &data)
 {
     int i;
     glBegin(GL_LINE_STRIP);
@@ -122,13 +68,49 @@ void draw_rect(int x, int y)
     glEnd();
 }
 
-void draw_line_fft(double* power)
+void draw_line_fft(std::vector<double> &power)
 {
     int i;
     int val;
+
     for (i = 1; i < NUM_DOTS/4; i++) {
         val = power[i]/20.0;
         val = fmin(val, 256);
         draw_rect(2*i, val);
+    }
+}
+
+void draw_spectrogram_line(int x, std::vector<double> &spec_line)
+{
+    int y;
+    glBegin(GL_QUAD_STRIP); /* Top left, bottom left, bottom right, top right */
+
+    for (y = 0; y < 256; y++) {
+        double colorval = spec_line[y];
+        colorval = 1 - colorval;
+        glColor3f(colorval, colorval, colorval);
+        int y_pos = y + 256;
+        glVertex2f(x, y_pos);
+        glVertex2f(x+1, y_pos);
+    }
+
+    glEnd();
+}
+
+void draw_spectrogram(std::deque<std::vector<double>> spectrogram)
+{
+    for (auto spec_line = spectrogram.begin(); spec_line != spectrogram.end(); spec_line++) {
+        int x_pos = spec_line - spectrogram.begin();
+        draw_spectrogram_line(x_pos, *spec_line);
+    }
+}
+
+void normalize(std::vector<double> &fft)
+{
+    double max = *std::max_element(fft.begin()+3, fft.end());
+    if (0 < max) {
+        std::transform(fft.begin(), fft.end(), fft.begin(), [max](double x) {
+            return x/max;
+        });
     }
 }

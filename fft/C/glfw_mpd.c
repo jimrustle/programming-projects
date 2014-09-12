@@ -1,5 +1,7 @@
-#include "glfw_mpd.h"
-#include <sys/time.h>
+#include "constants.h"
+#include "drawing.h"
+#include <math.h>
+#include <fftw3.h>
 
 GLFWwindow* window;
 
