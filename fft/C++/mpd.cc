@@ -4,31 +4,40 @@
 
 #include <fftw3.h>
 #include <cmath>
+#include <iostream>
 
 GLFWwindow* window;
 
 int main(void)
 {
     FILE *fp = fopen("/tmp/mpd.fifo", "rb");
+
+    if (fp == NULL) {
+        std::cout << "ayy, /tmp/mpd.fifo not found -- is mpd running?" << std::endl;
+        return 1;
+    }
+
     std::vector<double> signal(NUM_DOTS, 0);
     std::vector<double> draw_fft(NUM_DOTS/4, 0);
     std::deque< std::vector<double> > spectrogram(NUM_DOTS/2, draw_fft);
 
     fftw_complex fft_out[NUM_DOTS] = {{0}};
-    fftw_plan p = fftw_plan_dft_r2c_1d(NUM_DOTS, signal.data(), fft_out, FFTW_ESTIMATE);
+    fftw_plan p = fftw_plan_dft_r2c_1d(NUM_DOTS, signal.data(), fft_out, FFTW_MEASURE);
 
     init();
 
-    while(!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
         get_signal(signal, fp);
 
         draw_line_scope(signal);
         fftw_execute(p);
 
+        draw_fft.clear();
+
         for (int i = 0; i < NUM_DOTS/4; i++) {
-            draw_fft[i] = sqrt(fft_out[i][1] * fft_out[i][1] +
-                               fft_out[i][0] * fft_out[i][0]);
+            draw_fft.push_back(sqrt(fft_out[i][1] * fft_out[i][1] +
+                               fft_out[i][0] * fft_out[i][0]));
         }
 
         draw_line_fft(draw_fft);
@@ -48,6 +57,6 @@ int main(void)
     glfwTerminate();
     fclose(fp);
 
-    printf("Program quit.\n");
+    std::cout << "Program quit." << std::endl;
     return 0;
 }

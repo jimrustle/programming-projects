@@ -2,11 +2,18 @@
 #include "drawing.h"
 #include <math.h>
 #include <fftw3.h>
+#include <stdio.h>
 
 GLFWwindow* window;
 
 int main()
 {
+    FILE* fp = fopen("/tmp/mpd.fifo", "rb");
+
+    if (fp == NULL) {
+        printf("ayy, /tmp/mpd.fifo not found -- is mpd running?\n");
+        return 1;
+    }
     int i;
     double signal[NUM_DOTS] = {0};
     fftw_complex fft_out[NUM_DOTS] = {{0}};
@@ -22,7 +29,6 @@ int main()
     double outputs[256*512] = {0};
 
 
-    FILE* fp = fopen("/tmp/mpd.fifo", "rb");
 
     init();
 
