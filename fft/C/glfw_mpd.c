@@ -14,8 +14,10 @@ int main()
         printf("ayy, /tmp/mpd.fifo not found -- is mpd running?\n");
         return 1;
     }
+
     int i;
     double signal[NUM_DOTS] = {0};
+
     fftw_complex fft_out[NUM_DOTS] = {{0}};
 
     fftw_plan p = fftw_plan_dft_r2c_1d(NUM_DOTS, signal, fft_out, FFTW_MEASURE);
@@ -25,10 +27,8 @@ int main()
 
     int start = 0;
     /* 256 = number of pixels to store vertically
-     * 512= number of lines to store horizontally */
+     * 512= number of lines of pixels to store horizontally */
     double outputs[256*512] = {0};
-
-
 
     init();
 
@@ -54,18 +54,23 @@ int main()
         /* draw it without normalization */
         draw_line_fft(outputs+start*256);
 
-        /* normalize (in-place) to store it within the circular buffer */
+        /* normalize (in-place) and store it within the circular buffer */
         normalize(outputs+start*256);
 
-        /* then shift the index of the oldest array by one */
+        /* then shift the index of the oldest spectrogram line in the
+         * array by one */
         start++;
         start %= 512;
 
+
+        /* starting from that "start" position, plot the next 256 spectrogram
+         * lines of data */
         int x;
+        int address;
         for (x = 0; x < 512; x++) {
-            int address = (start+x)*256;
-            address %= 256*512;
-            draw_spec_line(x, &outputs[address]);
+            address = (start+x) * 256;
+            address %= 256 * 512;
+            draw_spec_line(x, outputs + address);
         }
 
         /* update screen */

@@ -37,7 +37,7 @@ void init()
     glDisable(GL_TEXTURE_1D);
     glDisable(GL_TEXTURE_2D);
 
-    /* Background to black */
+    // Background to white
     glClearColor(1.f, 1.f, 1.f, 0.f);
     glOrtho(0, 1024, 0, 512, 0, 1);
 }
@@ -55,7 +55,7 @@ void draw_line_scope(std::vector<double> &data)
 
 void draw_rect(int x, int y)
 {
-    glBegin(GL_QUADS); /* Top left, bottom left, bottom right, top right */
+    glBegin(GL_QUADS); // Top left, bottom left, bottom right, top right
     glColor3f(1, 0, 0);
     y += 256;
 
@@ -83,7 +83,7 @@ void draw_line_fft(std::vector<double> &power)
 void draw_spectrogram_line(int x, std::vector<double> &spec_line)
 {
     int y;
-    glBegin(GL_QUAD_STRIP); /* Top left, bottom left, bottom right, top right */
+    glBegin(GL_QUAD_STRIP); // Top left, bottom left, bottom right, top right
 
     for (y = 0; y < 256; y++) {
         double colorval = spec_line[y];
@@ -99,7 +99,9 @@ void draw_spectrogram_line(int x, std::vector<double> &spec_line)
 
 void draw_spectrogram(std::deque<std::vector<double>> spectrogram)
 {
-    for (auto spec_line = spectrogram.begin(); spec_line != spectrogram.end(); spec_line++) {
+    for (auto spec_line = spectrogram.begin();
+              spec_line != spectrogram.end();
+              spec_line++) {
         int x_pos = spec_line - spectrogram.begin();
         draw_spectrogram_line(x_pos, *spec_line);
     }
@@ -109,8 +111,9 @@ void normalize(std::vector<double> &fft)
 {
     double max = *std::max_element(fft.begin()+3, fft.end());
     if (0 < max) {
-        std::transform(fft.begin(), fft.end(), fft.begin(), [max](double x) {
-            return x/max;
-        });
+        std::transform(fft.begin(), fft.end(), fft.begin(),
+            [max](double x) {
+                return x/max;
+            });
     }
 }
