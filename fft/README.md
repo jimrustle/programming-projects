@@ -27,6 +27,7 @@ uses luajit-glfw and luajit-fftw3
 - Commmon Lisp - cl-opengl and lispbuilder-sdl
 - Scheme - in the works, planning to use guile-2d and a currently undecided fft library
 - Matlab for fun (warning: major bugs)
+- Rust - ISN'T THIS THE UGLIEST THING EVER? nb: needs cleanup with modules and crates
 
 # Licensing
 Public domain.

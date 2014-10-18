@@ -1,0 +1,12 @@
+[package]
+
+name = "mpd_display"
+version = "0.0.1"
+authors = ["Jim Rustle <jim_rustle@live.com>"]
+
+[dependencies.gl_generator]
+git = "https://github.com/bjz/gl-rs"
+
+[dependencies.glfw]
+git = "https://github.com/bjz/glfw-rs"
+
