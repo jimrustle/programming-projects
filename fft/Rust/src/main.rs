@@ -17,15 +17,13 @@ mod gl {
 // Numerical Recipes. The Art of Scientific Computing, 3rd Edition, 2007
 // ISBN 0-521-88068-8.
 
-fn swap (data: &mut Vec<f32>, i: uint, j:uint) {
-    let a = (*data)[i];
-    let b = (*data)[j];
-
-    *data.get_mut(i) = b;
-    *data.get_mut(j) = a;
+fn swap (data: &mut Box<[f32, .. 2048]>, i: uint, j:uint) {
+    let tmp = data[j];
+    data[j] = data[i];
+    data[i] = tmp;
 }
 
-fn four1(data: &mut Vec<f32>, nn: uint) {
+fn four1(data: &mut Box<[f32, .. 2048]>, nn: uint) {
     let n = nn << 1;
     let mut j = 1;
 
@@ -57,13 +55,13 @@ fn four1(data: &mut Vec<f32>, nn: uint) {
         for m in range_step(1, mmax, 2) {
             for i in range_step(m, n, istep) {
                 j = i + mmax;
-                let tempr = wr * (*data)[j-1] - wi * (*data)[j];
-                let tempi = wr * (*data)[j] + wi * (*data)[j-1];
+                let tempr = wr * data[j-1] - wi * data[j];
+                let tempi = wr * data[j] + wi * data[j-1];
 
-                *data.get_mut(j-1) = (*data)[i-1] - tempr;
-                *data.get_mut(j) = (*data)[i] - tempi;
-                *data.get_mut(i-1) += tempr;
-                *data.get_mut(i) += tempi;
+                data[j-1] = data[i-1] - tempr;
+                data[j] = data[i] - tempi;
+                data[i-1] += tempr;
+                data[i] += tempi;
             }
             wtemp = wr;
             wr += wr * wpr - wi * wpi;
@@ -73,26 +71,26 @@ fn four1(data: &mut Vec<f32>, nn: uint) {
     }
 }
 
-fn draw_spectrogram_line(x: f32, spec_line: &Vec<f32>) {
+fn draw_spectrogram_line(x: f32, spec_line: &Box<[f32, .. 256]>) {
     unsafe {
         gl::Begin(gl::QUAD_STRIP); // Top left, bottom left, bottom right, top right
 
-    for y in range(0u, 256) {
-        let y_pos = y as f32+ 256.0;
-        let colorval = 1.0 - spec_line[y];
-        //colorval = 1 - colorval;
-        gl::Color3f(colorval, colorval, colorval);
-        gl::Vertex2f(x, y_pos);
-        gl::Vertex2f(x+1.0, y_pos);
-    }
+        for y in range(0u, 256) {
+            let y_pos = y as f32 + 256.0;
+            let colorval = 1.0 - spec_line[y];
+            //colorval = 1 - colorval;
+            gl::Color3f(colorval, colorval, colorval);
+            gl::Vertex2f(x, y_pos);
+            gl::Vertex2f(x+1.0, y_pos);
+        }
 
         gl::End();
     }
 }
 
-fn draw_spectrogram(spectrogram: &RingBuf<Vec<f32>>) {
-    for (i, spec_line) in range(0f32, 512.0).zip(spectrogram.iter()) {
-        draw_spectrogram_line(i, spec_line);
+fn draw_spectrogram(spectrogram: &RingBuf<Box<[f32, .. 256]>>) {
+    for i in range(0u, 512) {
+        draw_spectrogram_line(i as f32, &spectrogram[i]);
     }
 }
 
@@ -101,8 +99,8 @@ fn draw_rect(mut x: f32, mut y: f32) {
         gl::Begin(gl::QUADS);
         gl::Color3f(1.0, 0.0, 0.0);
 
-    y += 256.0;
-    x += 512.0;
+        y += 256.0;
+        x += 512.0;
 
         gl::Vertex2f(x, y);
         gl::Vertex2f(x, 256.0);
@@ -112,7 +110,7 @@ fn draw_rect(mut x: f32, mut y: f32) {
     }
 }
 
-fn draw_line_fft(array: &Vec<f32>) {
+fn draw_line_fft(array: &Box <[f32, .. 256]>) {
     let mut val;
     for i in range(1u, 256) {
         val = array[i]/20.0;
@@ -125,7 +123,7 @@ fn draw_line_fft(array: &Vec<f32>) {
     }
 }
 
-fn draw_line_scope(array: &Vec<f32>) {
+fn draw_line_scope(array: &Box<[f32, .. 2048]>) {
     unsafe {
         gl::Begin(gl::LINE_STRIP);
         gl::Color3f(1.0, 0.0, 0.0);
@@ -136,13 +134,28 @@ fn draw_line_scope(array: &Vec<f32>) {
     }
 }
 
-fn read_bytes(f: &mut IoResult<File>, buf: &mut Vec<f32>) {
-    buf.clear();
-    for i in range(0u, 1024) {
+fn normalize(array: &mut Box<[f32, .. 256]>) {
+    let mut max = array[2];
+
+    for i in range(3, 256) {
+        if max < array[i] {
+            max = array[i];
+        }
+    }
+
+    if 0.0f32 < max {
+        for i in range(0, 256) {
+            array[i] /= max;
+        }
+    }
+}
+
+fn read_bytes(f: &mut IoResult<File>, buf: &mut Box<[f32, .. 2048]>) {
+    for i in range_step(0u, 2048, 2) {
         match f.read_le_i16() {
             Ok(n) => {
-                buf.push(n as f32 / 256.0 + 128.0);
-                buf.push(0.0f32)},
+                buf[i] = n as f32 / 256.0 + 128.0;
+                buf[i+1] = 0.0f32;}
             Err(e) => println!("Error reading: {}", e)
         }
     }
@@ -170,54 +183,48 @@ fn main() {
     window.make_current();
 
     unsafe {
+        gl::Disable(gl::ALPHA_TEST);
+        gl::Disable(gl::BLEND);
+        gl::Disable(gl::DEPTH_TEST);
+        gl::Disable(gl::DITHER);
+        gl::Disable(gl::FOG);
+        gl::Disable(gl::LIGHTING);
+        gl::Disable(gl::LOGIC_OP);
+        gl::Disable(gl::STENCIL_TEST);
+        gl::Disable(gl::TEXTURE_1D);
+        gl::Disable(gl::TEXTURE_2D);
         gl::Ortho(0.0, 1024.0, 0.0, 512.0, 0.0, 1.0);
     }
 
-    let mut buf = Vec::with_capacity(2 * 1024);
-    let mut spectrogram : RingBuf<Vec<f32>> = RingBuf::with_capacity(512);
+    let mut buf = box [0.0f32, .. 2 * 1024];
+    let mut spectrogram : RingBuf<Box<[f32, .. 256]>> = RingBuf::with_capacity(512);
 
-    //spectrogram.reserve_exact(512);
-    for i in range(0u, 512) {
-        spectrogram.push(Vec::from_fn(512, |_| 0.0f32));
+    spectrogram.reserve_exact(512);
+    for _ in range(0u, 512) {
+        spectrogram.push(box [0.0f32, .. 256]);
     }
 
     while !window.should_close() {
-        let mut fft_out = Vec::with_capacity(256);
         unsafe {
             gl::ClearColor(1.0, 1.0, 1.0, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
+        let mut fft_out = box [0.0f32, .. 256];
 
-        buf.clear();
         read_bytes(&mut file, &mut buf);
         draw_line_scope(&buf);
 
         four1(&mut buf, 1024);
 
         for i in range_step(0, 2 * 256, 2) {
-            fft_out.push((buf[i].powi(2) + buf[i+1].powi(2)).sqrt());
+            fft_out[i/2] = (buf[i].powi(2) + buf[i+1].powi(2)).sqrt();
         }
 
         draw_line_fft(&fft_out);
 
         spectrogram.pop_front();
-
-        let mut max = 0.0f32;
-
-        for v in fft_out.iter() {
-            if max < *v {
-                max = *v;
-            }
-        }
-
-        max /= 100.0;
-
-        if 0.0f32 < max {
-            spectrogram.push(fft_out.iter().map(|x| x/max ).collect());
-        }
-        else {
-            spectrogram.push(fft_out);
-        }
+        normalize(&mut fft_out);
+        spectrogram.push(fft_out);
 
         draw_spectrogram(&spectrogram);
 
@@ -232,4 +239,8 @@ fn main() {
             }
         }
     }
+    //for val in buf.iter() {
+    //println!("{}", val);
+    //}
+
 }
