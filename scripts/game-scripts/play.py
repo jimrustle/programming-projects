@@ -6,14 +6,8 @@ from levels import *
 
 def main():
     focus()
-    level_one()
-    level_two()
-    level_three()
-    level_four()
-    level_five()
-    level_six()
-    level_seven()
-    level_eight()
-    level_nine()
+    parse(lv1)
+    # ...
+    parse(lv9)
 
 main()
