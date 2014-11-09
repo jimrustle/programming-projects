@@ -28,8 +28,11 @@ uses luajit-glfw and luajit-fftw3
 - Scheme - in the works, planning to use guile-2d and a currently undecided fft library
 - Matlab for fun (warning: major bugs)
 - Rust - it works now! if only it was as fast as C/C++/LuaJIT
+- Java - it's complete, but normalization is wonky -- uses jglfw, and meapsoft's
+fft library. Eventually, it'll use FFTW
 
 # Licensing
 Public domain.
 C and Lua implementations should be GPL2 as it uses FFTW.
+Java implementation is also GPL2, as Meapsoft code is used. (and eventually FFTW)
 
