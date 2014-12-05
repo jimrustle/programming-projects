@@ -1,14 +1,28 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include "vm.h"
 
-typedef struct reg {
-    int16_t v0, v1, v2, v3, v4, v5, v6, v7,
-            v8, v9, vA, vB, vC, vD, vE, vF;
-} reg;
+void run_opcode(int16_t op, vm* v) {
+    if (op == 0x00e0) {
+        printf("Clear screen!\n");
+    }
+}
 
-typedef struct vm {
-    reg registers;
-    unsigned char stack[64];
-    unsigned char memory[4096];
-} vm;
+void load_memory(FILE* program, vm *v) {
+    int8_t byte;
+    int i = 0x200;
+    while ((byte = (int8_t) fgetc(program)) != EOF) {
+        if (i == 0xEA0) {
+            puts("Out of memory error -- program exceeds 4096 byte limit");
+            exit(1);
+        }
+        if (byte == 0x00e0) {
+            printf("Clear screen!\n");
+    }
 
+        v->memory[i] = byte;
+        i++;
+    }
+
+}
