@@ -21,20 +21,15 @@ let read_create_array f =
 let draw_line l =
   GlDraw.color (1.0, 0.0, 0.0);
   GlDraw.begins `line_strip;
-  Array.iteri (fun idx hd -> GlDraw.vertex2 (float_of_int idx,
-                                             hd))
-                l;
+  Array.iteri (fun idx hd -> GlDraw.vertex2 (float_of_int idx, hd)) l;
   GlDraw.ends ()
 
 let draw_spectrogram s =
   let draw_spec_line x l =
     let normalize l =
-      let maximum = Array.fold_left (fun (x:float) (y:float) -> if x > y then x else y) 0.0
+      let maximum = Array.fold_left (fun x y -> if x > y then x else y) 0.0
       (Array.sub l 3 252) in
-      (* l in *)
-      if maximum > 0.1 then
-        Array.map (fun x -> x /. maximum) l
-      else l in
+      if maximum > 2.0 then Array.map (fun x -> x /. maximum) l else l in
     let line = normalize l in
     GlDraw.begins `quad_strip;
     Array.iteri (fun y intensity ->
@@ -43,10 +38,9 @@ let draw_spectrogram s =
                  GlDraw.color (colorval, colorval, colorval);
                  GlDraw.vertex2 (x, ypos);
                  GlDraw.vertex2 (x +. 1.0, ypos))
-                line;
+               line;
     GlDraw.ends () in
-  BatDeque.iteri (fun x l ->
-                  draw_spec_line (float_of_int x) l) s
+  BatDeque.iteri (fun x l -> draw_spec_line (float_of_int x) l) s
 
 let draw_fft fft_signal =
   let draw_rect x y =
@@ -61,33 +55,27 @@ let draw_fft fft_signal =
     GlDraw.vertex2 (xnew +. 1.0, ynew);
 
     GlDraw.ends () in
-  Array.iteri (fun i v -> draw_rect (float_of_int i)
-                                    (min (v /. 20.0) 256.0))
+  Array.iteri (fun i v -> draw_rect (float_of_int i) (min (v /. 20.0) 256.0))
               fft_signal
 
-let draw signal fft_signal s = 
+let draw signal fft_signal s =
   GlClear.clear [`color];
   draw_line signal;
   draw_fft fft_signal;
   draw_spectrogram s;
   Gl.flush ();
   Glut.swapBuffers()
-             
+
 let deque_generator () =
-  let build_deque () =
-    let rec loop n res =
-      if n = 512 then res else
-        loop (n + 1) (BatDeque.snoc res (Array.init 256 (fun _ -> 0.0))) in
-    loop 0 BatDeque.empty in
-  let s = ref (build_deque ()) in
-  let update fft_signal =
-    match BatDeque.front !s with
-      Some (_, xs) ->
-      s := BatDeque.snoc xs fft_signal;
-      !s
-    | None -> !s in
-  update
-    
+  let rec loop n res =
+    if n = 512 then res else
+      loop (n + 1) (BatDeque.snoc res (Array.init 256 (fun _ -> 0.0))) in
+  let spectrogram = ref (loop 0 BatDeque.empty) in
+  (fun fft_signal ->
+    match BatDeque.front !spectrogram with
+      Some (_, xs) -> spectrogram := BatDeque.snoc xs fft_signal; !spectrogram
+    | None -> !spectrogram)
+
 let () =
   ignore (Glut.init Sys.argv);
   Glut.initWindowSize 1024 512;
@@ -103,7 +91,7 @@ let () =
                     let signal = Array.map (float_of_int) (read_create_array f) in
                     let mag c = sqrt(c.re *. c.re +. c.im *. c.im) in
                     let fft_signal = Array.map (mag) (fft_r2c signal) in
-                    draw signal fft_signal (s fft_signal) );;
+                    draw signal fft_signal (s fft_signal));;
 
   Glut.idleFunc ~cb:(Some Glut.postRedisplay);
   Glut.keyboardFunc ~cb:(fun ~key ~x ~y -> if key=113 then exit 0);
