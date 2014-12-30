@@ -3,6 +3,8 @@
 #include <math.h>
 #include <fftw3.h>
 #include <stdio.h>
+#include <pthread.h>
+
 
 GLFWwindow* window;
 
@@ -47,7 +49,7 @@ int main()
         /* write the magnitudes of the FFT into the oldest location*/
         /* of the circular buffer */
         for (i = 0; i < 256; i++) {
-            (outputs+start*256)[i] = sqrt(fft_out[i][1] * fft_out[i][1] +
+            outputs[start*256 + i] = sqrt(fft_out[i][1] * fft_out[i][1] +
                                           fft_out[i][0] * fft_out[i][0]);
         }
 
@@ -82,6 +84,7 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
     printf("Program quit.\n");
 
     return 0;

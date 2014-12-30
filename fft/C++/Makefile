@@ -1,4 +1,4 @@
-CC = /usr/bin/g++-4.8
+CC = /usr/bin/clang++
 #CFLAGS = -Wall -I$$HOME/.local/include -I/usr/include/SDL -pedantic -std=c99 -march=native -mtune=native -mfpmath=sse -flto -funroll-loops -fomit-frame-pointer -Ofast #-Wextra -Werror
 CFLAGS = -Wall -I$$HOME/.local/include -pedantic -std=c++11 -O3
 LDFLAGS = -lGL -lglfw -lfftw3

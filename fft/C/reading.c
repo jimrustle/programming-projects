@@ -5,7 +5,7 @@
 void fill_buffer(double *buffer, FILE* fp)
 {
     int16_t buf[NUM_DOTS] = {0};
-    fread(buf, sizeof(int16_t), NUM_DOTS, fp);
+    fread(buf, sizeof(buf[0]), (size_t) NUM_DOTS, fp);
 
     size_t i;
 
