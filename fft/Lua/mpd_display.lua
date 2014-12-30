@@ -85,7 +85,7 @@ function magnitude(out, draw_output)
 end
 
 lj_glfw.init()
-local window = lj_glfw.Window(1024, 512, "MPD Visualiser")
+local window = lj_glfw.Window(1024, 512, "LuaJIT MPD Visualiser")
 
 window:setKeyCallback(
 function(window, key)
