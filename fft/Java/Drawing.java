@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Drawing {
     public static long init() {
         glfwInit();
-        long window = glfwCreateWindow(1024, 512, "MPD Display", 0, 0);
+        long window = glfwCreateWindow(1024, 512, "Java MPD Visualiser", 0, 0);
 
         glfwSetCallback(new GlfwCallbackAdapter() {
             @Override

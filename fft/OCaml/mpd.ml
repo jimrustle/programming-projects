@@ -80,7 +80,7 @@ let () =
   ignore (Glut.init Sys.argv);
   Glut.initWindowSize 1024 512;
   Glut.initDisplayMode ~double_buffer:true ();
-  ignore (Glut.createWindow "MPD Display");
+  ignore (Glut.createWindow "OCaml MPD Visualiser");
   GlMat.ortho ~x:(0., 1024.0) ~y:(0., 512.0) ~z:(0., 1.);
 
   GlClear.color (1.0, 1.0, 1.0);

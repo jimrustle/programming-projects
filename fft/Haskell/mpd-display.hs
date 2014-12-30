@@ -113,7 +113,7 @@ mainDrawLoop spectrogram stream win = do
 main :: IO ()
 main = do
      True <- GLFW.init
-     Just win <- GLFW.createWindow 1024 512 "Haskell MPD Visuaizer"
+     Just win <- GLFW.createWindow 1024 512 "Haskell MPD Visualiser"
                  Nothing Nothing
      GLFW.makeContextCurrent (Just win)
 
@@ -125,3 +125,4 @@ main = do
      mainDrawLoop s stream win
 
      shutdown stream win
+

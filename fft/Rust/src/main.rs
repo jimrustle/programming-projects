@@ -23,7 +23,7 @@ fn main() {
     let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
     glfw.window_hint(glfw::ContextVersion(3, 0));
 
-    let (window, events) = glfw.create_window(1024, 512, "Rust MPD Display", glfw::Windowed)
+    let (window, events) = glfw.create_window(1024, 512, "Rust MPD Visualiser", glfw::Windowed)
         .expect("Failed to create GLFW window.");
 
 

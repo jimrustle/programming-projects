@@ -16,7 +16,7 @@ void init()
 {
     glfwInit();
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    window = glfwCreateWindow(1024, 512, "MPD Visualizer", NULL, NULL);
+    window = glfwCreateWindow(1024, 512, "MPD Visualiser", NULL, NULL);
 
     glfwSetKeyCallback(window, key);
     glfwMakeContextCurrent(window);
@@ -36,7 +36,7 @@ void init()
 
     /* Background to black */
     glClearColor(1.f, 1.f, 1.f, 0.f);
-    glOrtho(0, 1024, 0, 512, 0, 1);
+    glOrtho(0.0f, 1024.0f, 0.0f, 512.0f, 0.0f, 1.0f);
 }
 
 
@@ -46,8 +46,8 @@ void draw_spec_line(int x, double *array)
     glBegin(GL_QUAD_STRIP); /* Top left, bottom left, bottom right, top right */
 
     for (y = 0; y < 256; y++) {
-        double colorval = array[y];
-        colorval = 1 - colorval;
+        double colorval = 1 - array[y];
+        /*colorval = 1 - colorval;*/
         glColor3f(colorval, colorval, colorval);
         int y_pos = y + 256;
         glVertex2f(x, y_pos);

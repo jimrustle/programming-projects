@@ -19,7 +19,7 @@ void init()
 {
     glfwInit();
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    window = glfwCreateWindow(1024, 512, "MPD Visualizer", NULL, NULL);
+    window = glfwCreateWindow(1024, 512, "MPD Visualiser", NULL, NULL);
 
     glfwSetKeyCallback(window, key);
     glfwMakeContextCurrent(window);
