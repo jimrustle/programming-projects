@@ -3,10 +3,6 @@
 #include <math.h>
 #include <fftw3.h>
 #include <stdio.h>
-#include <pthread.h>
-
-
-GLFWwindow* window;
 
 int main()
 {
@@ -17,7 +13,7 @@ int main()
         return 1;
     }
 
-    int i;
+    unsigned int i;
     double signal[NUM_DOTS] = {0};
 
     fftw_complex fft_out[NUM_DOTS] = {{0}};
@@ -27,12 +23,13 @@ int main()
     /* circular buffer -- shift the pointers instead of using
        memcpy or memmove */
 
-    int start = 0;
+    unsigned int start = 0;
     /* 256 = number of pixels to store vertically
      * 512= number of lines of pixels to store horizontally */
     double outputs[256*512] = {0};
 
-    init();
+    GLFWwindow* window;
+    window = init();
 
     while(!glfwWindowShouldClose(window)) {
 
@@ -40,6 +37,9 @@ int main()
 
         /* Fill the input buffer and draw it to the screen */
         fill_buffer(signal, fp);
+
+        /* optional windowing */
+        /*hann_window(signal);*/
 
         draw_line_scope(signal);
 
@@ -64,15 +64,14 @@ int main()
         start++;
         start %= 512;
 
-
         /* starting from that "start" position, plot the next 256 spectrogram
          * lines of data */
-        int x;
-        int address;
+        unsigned int x;
+        unsigned int address;
         for (x = 0; x < 512; x++) {
-            address = (start+x) * 256;
-            address %= 256 * 512;
-            draw_spec_line(x, outputs + address);
+            address = start + x;
+            address %= 512;
+            draw_spec_line(x, outputs + (address * 256));
         }
 
         /* update screen */
@@ -89,3 +88,4 @@ int main()
 
     return 0;
 }
+

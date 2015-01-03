@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-extern GLFWwindow* window;
-
 void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == 'Q') {
@@ -12,11 +10,11 @@ void key(GLFWwindow* window, int key, int scancode, int action, int mods)
     }
 }
 
-void init()
+GLFWwindow* init()
 {
     glfwInit();
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    window = glfwCreateWindow(1024, 512, "MPD Visualiser", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1024, 512, "MPD Visualiser", NULL, NULL);
 
     glfwSetKeyCallback(window, key);
     glfwMakeContextCurrent(window);
@@ -37,12 +35,21 @@ void init()
     /* Background to black */
     glClearColor(1.f, 1.f, 1.f, 0.f);
     glOrtho(0.0f, 1024.0f, 0.0f, 512.0f, 0.0f, 1.0f);
+    return window;
+}
+
+void hann_window(double *signal)
+{
+    unsigned int i;
+    for (i = 0; i < NUM_DOTS; i++) {
+        signal[i] *= 0.54 - 0.46 * cos(6.28318 * i / (NUM_DOTS - 1));
+    }
 }
 
 
 void draw_spec_line(int x, double *array)
 {
-    int y;
+    unsigned int y;
     glBegin(GL_QUAD_STRIP); /* Top left, bottom left, bottom right, top right */
 
     for (y = 0; y < 256; y++) {
@@ -59,11 +66,11 @@ void draw_spec_line(int x, double *array)
 
 void normalize(double *array)
 {
-    int i;
+    unsigned int i;
     double max;
     max = array[1];
 
-    for (i = 1; i < 256; i++) {
+    for (i = 3; i < 256; i++) {
         if (max < array[i]) {
             max = array[i];
         }
@@ -78,7 +85,7 @@ void normalize(double *array)
 
 void draw_line_scope(double* data)
 {
-    int i;
+    unsigned int i;
     glBegin(GL_LINE_STRIP);
     glColor3f(1, 0, 0);
     for (i = 0; i < NUM_DOTS; i++) {
@@ -104,11 +111,12 @@ void draw_rect(int x, int y)
 
 void draw_line_fft(double* power)
 {
-    int i;
-    int val;
+    unsigned int i;
+    unsigned int val;
     for (i = 1; i < NUM_DOTS/4; i++) {
         val = power[i]/20.0;
         val = fmin(val, 256);
         draw_rect(2*i, val);
     }
 }
+

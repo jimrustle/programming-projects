@@ -13,3 +13,4 @@ void fill_buffer(double *buffer, FILE* fp)
         buffer[i] = (buf[i] >> 8) + 128.0;
     }
 }
+

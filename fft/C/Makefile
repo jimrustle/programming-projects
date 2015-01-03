@@ -1,5 +1,5 @@
 CC = /usr/bin/gcc-4.8
-CFLAGS = -Wall -I$$HOME/.local/include -pedantic -std=c99 -g
+CFLAGS = -Wall -I$$HOME/.local/include -pedantic -std=c99 -O3 #-g -fsanitize=address
 LDFLAGS = -lm -lGL -lglfw -lfftw3
 TARGET = glfw_mpd
 
