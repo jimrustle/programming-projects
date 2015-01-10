@@ -3,6 +3,10 @@
 name = "mpd_display"
 version = "0.0.1"
 authors = ["Jim Rustle <jim_rustle@live.com>"]
+build = "build.rs"
+
+[build-dependencies]
+gl_generator = "*"
 
 [dependencies.gl_generator]
 git = "https://github.com/bjz/gl-rs"

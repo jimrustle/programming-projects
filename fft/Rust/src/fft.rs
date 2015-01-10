@@ -1,4 +1,5 @@
 use std::iter::range_step;
+use std::num::Float;
 use std::f32::consts::PI;
 
 // -- should be using fftw instead, but I don't know how to link C libs in Rust
@@ -6,13 +7,13 @@ use std::f32::consts::PI;
 // Numerical Recipes. The Art of Scientific Computing, 3rd Edition, 2007
 // ISBN 0-521-88068-8.
 
-fn swap (data: &mut Box<[f32, .. 2048]>, i: uint, j:uint) {
+fn swap (data: &mut Box<[f32; 2048]>, i: usize, j:usize) {
     let tmp = data[j];
     data[j] = data[i];
     data[i] = tmp;
 }
 
-pub fn four1(data: &mut Box<[f32, .. 2048]>, nn: uint) {
+pub fn four1(data: &mut Box<[f32; 2048]>, nn: usize) {
     let n = nn << 1;
     let mut j = 1;
 
