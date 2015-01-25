@@ -2,11 +2,6 @@ from autopy import key
 from time import sleep
 import random
 
-L = "L"
-R = "R"
-U = "U"
-D = "D"
-
 def focus():
     print "You have five seconds to focus on the window"
     sleep(5)
@@ -47,16 +42,22 @@ def m(dir, n = 1, delay = 0.10):
 def parse(level_string):
     for token in level_string.split(" "):
         if len(token) == 1:
+            print("single move: ", token)
             m(token)
         elif ',' in token:
             s = token.split(",")
-            m(token[0], int(s[1:]), float(s[1]))
-        elif len(token) == 2:
-            m(token[0], int(token[1:]))
+            print("comma token: ", s)
+            print("token: ", token[0], s[0][1:], s[1])
+            m(token[0], int(s[0][1:]), float(s[1]))
         elif token == "wait_bomb":
+            print("wait_bomb")
             wait_bomb()
         elif token == "end_level":
+            print("end_level")
             end_level()
+        elif len(token) >= 2:
+            print("single move: ", token)
+            m(token[0], int(token[1:]))
         else:
             print("fuggg broken token", token)
 
@@ -76,4 +77,10 @@ lv7 = "L D R L wait_bomb R4 U R L D L4 U D wait_bomb U4 R L U D wait_bomb U3 R U
 
 lv8 = "R R R3,0.5 U6 L D2 R D2 L3 U5 L9,0.05 D11,0.05 R6 L wait_bomb R2 U2 D2 R4 L wait_bomb R4 L10,0.05 U4 R L D4 L4 U4 R3 L3,0.01 U U6 R5 D5 L3 R3 U5 R4 D5 R5 U2 D2 L5 U5 L2 D5 U5 L7,0.05 end_level"
 
-lv9 = "L7 D6 U8 R U3 D3 L D2 R6 U2 R U D wait_bomb U2 R4 U L8 D R4 D2 L4 D6 L D2 L R U6 R U R8 D R3 U2 L U3 wait_bomb R D5 L2 D2 L5 R5 D4 R L U3 L5 D U9 end_level"
+lv9 = "L7 D6 U8 R U3 D3 L D2 R6 U2 R U D wait_bomb U2 R4 U L8 D R4 D2 L4 D6 L D2 L R U6 R U R8 D R3 U2 L U3 wait_bomb R D5 L2 D2 L5 R5 D4 R L U4 L5 D2 U9 end_level"
+
+lv10 = "R D4 L6 R6 D4 L14 U4 R L U4 R5 D2 R6 U2 L R D2 L6 U2 R L wait_bomb R3 L3 D2 L5 D8 R11 L11 U4 R6 L6 U4 R5 U2 R4 L4 D2 R6 U2 R3 end_level"
+
+lv11 = "wait_bomb R8 L2 wait_bomb R2 D3 L2 D3 L2 U4 wait_bomb R L D L2 D5 wait_bomb R L U2 L R wait_bomb U4 L D L2 R wait_bomb D5 L U2 L3 U4 R L3 U4 D R2 U L R wait_bomb R9,0.05 L9,0.05 D2 L D4 R11 U R2 D4 U4 L2 D L11 U4 R4 end_level"
+
+lv12 = "D11 L14 U11 R7 L7 D9 Rend_level"
