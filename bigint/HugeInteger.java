@@ -9,8 +9,10 @@ public class HugeInteger {
         boolean b = stringVal.matches("-?\\d*");
 
         // regexp match for - and digits
-        if (!b) throw new
-                NumberFormatException("illegal characters in string value");
+        if (!b) {
+            System.out.println(stringVal);
+            throw new NumberFormatException("illegal characters in string value");
+        }
 
         // if - appears, then it is negative
         if (stringVal.charAt(0) == '-') {
@@ -29,7 +31,7 @@ public class HugeInteger {
 
     public HugeInteger(int n) throws IllegalArgumentException {
         if (n < 1) throw new
-                   IllegalArgumentException("arg must be greater than one");
+            IllegalArgumentException("arg must be greater than one");
 
         Random r = new Random();
 
@@ -70,19 +72,27 @@ public class HugeInteger {
 
         // different signs
         if (sign ^ h.sign) {
-            if (compareTo(h) == 0) {
-                return new HugeInteger("0");
-            }
             // subtract using char arrays, since Java strings are immutable
+            char[] tmp;
             char[] t = top.toCharArray();
             char[] b = bottom.toCharArray();
             char[] ret = new char[t.length];
 
+            if (compareTo(h.__negate__()) == 0) {
+                return new HugeInteger("0");
+            }
+            else if (compareTo(h) == -1) {
+                tmp = b;
+                b = t;
+                t = tmp;
+            }
+
             int length = t.length;
             int borrow = 0;
             boolean neg = false;
+            // line up on the right and iterate
             for (int i = length - 1; i >= 0; i--) {
-                diff = t[i] - b[i];
+                diff = t[i] - b[i]; // subtract
                 // borrow if difference is less than 0
                 if (diff < 0) {
                     if (i == 0) {
@@ -117,7 +127,6 @@ public class HugeInteger {
             // if carry still exists, add one to our number on the left
             if (carry == 1) {
                 result = "1" + result;
-                numDigits++;
             }
 
             // set the sign: (-a + -b) = -(a + b)
@@ -128,10 +137,14 @@ public class HugeInteger {
     }
 
     public HugeInteger subtract(HugeInteger h) {
-            return add(h.__negate__());
+        int c = compareTo(h);
+        if (c == 0) return new HugeInteger("0");
+        else if (c == 1) return add(h.__negate__());
+        else return (h.add(this.__negate__())).__negate__();
     }
 
     public HugeInteger multiply(HugeInteger h) {
+        String returnString;
         char[] ret = new char[numDigits + h.numDigits];
         char[] a = value.toCharArray();
         char[] b = h.value.toCharArray();
@@ -140,7 +153,7 @@ public class HugeInteger {
         for (int i = 0; i < numDigits; i++) {
             for (int j = 0; j < h.numDigits; j++) {
                 ret[i+j] += (a[numDigits - 1 - i] - '0') *
-                            (b[h.numDigits - 1 - j] - '0');
+                    (b[h.numDigits - 1 - j] - '0');
             }
         }
 
@@ -163,10 +176,12 @@ public class HugeInteger {
             ret[j] = c;
         }
 
+        returnString = new String(ret);
+
         // set the sign
         // a * b is negative if and only if one of the values is negative
-        if (sign ^ h.sign) return new HugeInteger("-" + new String(ret));
-        else return new HugeInteger(new String(ret));
+        if (sign ^ h.sign) return new HugeInteger("-" + returnString);
+        else return new HugeInteger(returnString);
     }
 
     public int compareTo(HugeInteger h) {
@@ -174,13 +189,13 @@ public class HugeInteger {
         // both negative
         if (sign && h.sign) {
             // check number of digits
-            if (numDigits > h.numDigits) return 1;
-            else if (numDigits < h.numDigits) return -1;
+            if (numDigits > h.numDigits) return -1;
+            else if (numDigits < h.numDigits) return 1;
             // same number of digits means checking each one individually
             else {
                 for (int i = 0; i < numDigits; i++) {
-                    if (value.charAt(i) > h.value.charAt(i)) return 1;
-                    else if (value.charAt(i) < h.value.charAt(i)) return -1;
+                    if (value.charAt(i) > h.value.charAt(i)) return -1;
+                    else if (value.charAt(i) < h.value.charAt(i)) return 1;
                 }
                 return 0;
             }
@@ -216,16 +231,20 @@ public class HugeInteger {
     }
 
     private HugeInteger __negate__() {
-        sign = sign ? false : true;
-        return this;
+        HugeInteger ret = new HugeInteger(value);
+        ret.sign = sign^true;
+        return ret;
     }
 
     private void __compress__() {
         if (numDigits > 1)
             for (char c : value.toCharArray())
-                if (c == '0') { numDigits--;
-                                value = value.substring(1, value.length());}
+                if (c == '0') { numDigits--; value = value.substring(1, value.length());}
                 else break;
+    }
+
+    public void __print_debug__() {
+        System.out.println("Value: " + toString() + ", numDigits = " +  numDigits + ", sign = " + sign);
     }
 }
 
