@@ -7,6 +7,11 @@ build = "build.rs"
 
 [build-dependencies]
 gl_generator = "*"
+khronos_api = "*"
+
+[dependencies]
+libc = "*"
+byteorder = "*"
 
 [dependencies.gl_generator]
 git = "https://github.com/bjz/gl-rs"

@@ -1,14 +1,12 @@
-use std::io::{File, IoResult};
-use std::iter::range_step;
+extern crate byteorder;
 
-pub fn read_bytes(f: &mut IoResult<File>, buf: &mut Box<[f32; 2048]>) {
-    for i in range_step(0us, 2048, 2) {
-        match f.read_le_i16() {
-            Ok(n) => {
-                buf[i] = n as f32 / 256.0 + 128.0;
-                buf[i+1] = 0.0f32;}
-            Err(e) => println!("Error reading: {}", e)
-        }
+use std::fs::File;
+use self::byteorder::{LittleEndian, ReadBytesExt};
+
+pub fn read_file_get_vec(f: &mut File) -> Vec<f32> {
+    let mut v : Vec<f32> = Vec::with_capacity(1024);
+    for _ in 0 .. 1024 {
+        v.push(f.read_i16::<LittleEndian>().unwrap() as f32 / 256.0 + 128.0);
     }
+    v
 }
-
