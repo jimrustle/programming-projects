@@ -1,0 +1,18 @@
+
+Internals:
+the ground and platform is made of sticky tape, so touching it sets X and Y velocities to 0
+simple 9.8 m*s^-2 downwards physics
+move from platform A to platform B
+cylinder with legs and thrust engine, the "craft"
+
+Listener:
+Socket on port 42069
+
+REPL commands:
+"command arg1 arg2 ..."
+I: print info, (x, y, heading, engine_state, engine_heading, thrust)
+E state: toggles engine state, where state = "ON" or "OFF"
+H degree: set heading to degree (with 0 along the craft heading axis)
+T thrust: set thrust from 0 to 100%
+S: step in time
+Q: quit
