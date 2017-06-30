@@ -115,8 +115,8 @@ void ssd1306_draw_char(char ch, uint8_t size) {
         return; // don't draw anything to screen if \n
     }
     switch (size) {
-        // size of 2 uses a lookup table, while size of 3
-        // calculates the scaled glyph -- FIXME? - generalize scaling
+        // size of 2 uses a lookup table, while a size of 3 to 5
+        // calculates the scaled glyph
         case 5:
         case 4:
         case 3:
@@ -177,7 +177,7 @@ void ssd1306_draw_char(char ch, uint8_t size) {
                 /*}*/
                 // 16 = 3 * glyph_with + 1 kerning
                 /*ssd1306_cursor_to(cur_column + 17, cur_row - size + 1);*/
-                ssd1306_cursor_to(cur_column + 5*size + 2, cur_row - size);
+                ssd1306_cursor_to(cur_column + 5*size + 3, cur_row - size);
                 break;
             }
         case 2:

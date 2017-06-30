@@ -111,8 +111,14 @@ __interrupt void TIMERA0_ISR(void) {
         case NO_DATA:
             if (gps_fix) {
                 program_state = GPS_FIX;
+
                 ssd1306_clear_screen();
                 ssd1306_cursor_to(0, 0);
+            }
+            else {
+                ssd1306_cursor_to(20, 0);
+                text_size = 2;
+                my_printf("%d:%d:%d\n", time.hour, time.minute, time.second);
             }
             break;
         case GPS_FIX:
@@ -147,15 +153,14 @@ __interrupt void TIMERA0_ISR(void) {
 
                 // print temperature in upper-right corner
                 text_size = 1;
-                ssd1306_cursor_to(96, 0);
-                my_printf("%d @C\n", (temp & 0x7F));
+                ssd1306_cursor_to(104, 0);
+                my_printf("%d@C\n", (temp & 0x7F));
             }
             else {
                 program_state = NO_DATA;
 
                 ssd1306_clear_screen();
                 ssd1306_cursor_to(0, 3);
-
                 printf_mode = SSD_OLED;
                 text_size = 3;
                 my_printf("No data");
