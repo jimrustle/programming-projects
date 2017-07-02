@@ -71,6 +71,10 @@ int main(void) {
     ssd1306_init();
     ssd1306_cursor_to(0, 0);
     ssd1306_clear_screen();
+    ssd1306_cursor_to(0, 3);
+    printf_mode = SSD_OLED;
+    text_size = 3;
+    my_printf("No data");
 
     UCB0I2CSA = DS3231_ADDR;
     __bis_SR_register(GIE);
@@ -116,6 +120,7 @@ __interrupt void TIMERA0_ISR(void) {
                 ssd1306_cursor_to(0, 0);
             }
             else {
+                zero_padding = ONE;
                 ssd1306_cursor_to(20, 0);
                 text_size = 2;
                 my_printf("%d:%d:%d\n", time.hour, time.minute, time.second);
