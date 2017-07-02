@@ -9,7 +9,7 @@ MSP430G2553 microcontroller - programmed on a Launchpad, then removed and solder
 
 ## GPS - u-blox NEO-6M
 
-[gps schematic](doc/gps\_schematic.png)
+[gps schematic](doc/gps\_diagram.jpg)
 
 This GPS module is a u-blox NEO-6M unit that you can buy off eBay for about $10. It also comes with an I2C EEPROM (M24C32, 24AA32A) for storing configuration.
 
