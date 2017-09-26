@@ -1,0 +1,216 @@
+"magic 1,g:^:''+m.|s:^:, :|-j!
+syntax enable
+let mapleader=","
+
+set nocompatible   " Disable vi-compatibility
+
+" backups
+set nobackup
+set writebackup
+set viminfo=
+
+" user interface
+set modeline
+set history=5      " set commandline history to 10
+set showmatch       " flicker and match brackets while typing
+set cursorline      " highlight current line
+set autochdir       " automatically change into dir when opening a file
+set hlsearch        " highlight matches when searching
+set relativenumber  " shows lines relative to current
+set number          " shows current line in conjunction to relative
+set ruler           " always show cursor position
+set laststatus=2    " Always show the statusline
+set wildmenu        " menu of completions
+set wildmode=full   " biggest first
+set mouse=a
+
+set hidden          " enable hidden buffers
+
+" whitespace
+"set smartindent    " set auto indenting
+set autoindent      " keep indenting while <CR>
+set smarttab        " smart tabs
+set shiftwidth=4    " one tab = 4 spaces -> autoindent
+set tabstop=4       " one tab = 4 spaces (tab key)
+set softtabstop=4   " allows backspace to delete 4 backspaces at once
+set expandtab       " hard tabs are silly
+set backspace+=start,eol,indent
+"set listchars=tab:>-,trail:-
+set listchars=tab:»·,trail:·,nbsp:_,extends:>,precedes:< "eol:¬
+
+" language and spellcheck options
+set encoding=utf-8 " Necessary to show Unicode glyphs
+set spelllang=en_gb
+set nobomb
+"set fileencoding=ucs-bom,utf-8,iso-8859-1
+
+set lazyredraw " don't update screen while macros are running
+set list        " display unprintable characters
+set splitbelow
+set splitright
+set equalalways
+set scrolloff=15
+set ignorecase
+set wildignorecase
+set incsearch
+set autoread
+
+" custom vim script functions
+let g:dark_theme_set=1
+function! ChangeScheme()
+    if g:dark_theme_set
+        colorscheme Tomorrow
+        let g:dark_theme_set=0
+        let g:airlinetheme='tomorrow'
+    else
+        colorscheme Tomorrow-Night
+        let g:dark_theme_set=1
+        let g:airlinetheme='tomorow'
+    endif
+endfunction
+
+function! SwapWords()
+    let l:word1 = input("Word 1: ")
+    let l:word2 = input("Word 2: ")
+    execute '%substitute:' . l:word1 . ':xXtemp_wordXx:g'
+    execute '%substitute:' . l:word2 . ":" . l:word1 . ":g"
+    execute '%substitute:' . "xXtemp_wordXx" . ':' . l:word2 . ':g'
+endfunction
+
+" gui options
+if has('gui_running')
+    colorscheme jellybeans
+    let g:airline_theme = 'jellybeans'
+    "set guifont=Deja\ Vu\ Sans\ Mono\ 9
+    set guifont=Source\ Code\ Pro\ 10
+    "set guifont=Ubuntu\ Mono\ 10
+    "set guifont=Terminus\ 9
+    set guioptions-=T
+    set guioptions-=r
+    set guioptions-=L
+    set guioptions-=m
+    let $PATH = "/home/marisa/Programming/Processing:".$PATH
+else
+    let g:airline_theme = 'jellybeans'
+    colorscheme jellybeans
+    let $PATH = "/home/marisa/Programming/Processing:".$PATH
+endif
+
+" define keyboard mappings
+" keybinds
+nnoremap <F2> :set invpaste paste?<CR>
+inoremap jk <ESC>
+nmap <Space> <Plug>(easymotion-s)
+inoremap <C-a> <ESC>I
+inoremap <C-b> <ESC>bi
+inoremap <C-e> <ESC>A
+inoremap <C-u> <ESC>0C
+nnoremap <C-e> :SCCompile<CR>
+"inoremap <C-t> <ESC>hxpi
+nnoremap U :GundoToggle<CR>
+"nnoremap K :SCCompileRun<CR>
+nnoremap <leader>S :set spell!<CR>
+nnoremap <Tab> :bn<CR>
+nnoremap <S-Tab> :bp<CR>
+nnoremap ; :
+"nnoremap : ;
+"nnoremap <F3> :call ChangeScheme()<CR>
+inoremap <A-l> <C-v>u3bb<Space>   " λ
+inoremap <A-f> <C-v>u192<Space>   "ƒ
+inoremap <A--> <C-v>u2192<Space>  "→
+inoremap <A-a> <C-v>u03b1<Space>  "α
+inoremap <A-y> <C-v>u03c8<Space>  "ψ
+inoremap <A-o> <C-v>u25cb<Space>  "○
+"nnoremap f <Plug>(easymotion-s)
+"nnoremap K :pyf /home/marisa/.vim/clang-format.py
+let g:UltiSnipsExpandTrigger = '<C-d>'
+let g:UltiSnipsUsePythonVersion = 2
+
+set ttimeoutlen=50
+set pastetoggle=<F2>
+set showmode
+
+"folding settings
+set foldmethod=indent   "fold based on indent
+set foldnestmax=10      "deepest fold is 10 levels
+set nofoldenable        "dont fold by default
+set foldlevel=1         "this is just what i use
+
+"arrow keys are the devil
+" allow them only for command mode to scroll the history.
+inoremap  <Up>     <NOP>
+inoremap  <Down>   <NOP>
+inoremap  <Left>   <NOP>
+inoremap  <Right>  <NOP>
+noremap   <Up>     <NOP>
+noremap   <Down>   <NOP>
+noremap   <Left>   <NOP>
+noremap   <Right>  <NOP>
+noremap <F1> <esc>
+inoremap <F1> <esc>
+
+" vundle plugins
+set rtp+=~/.vim/bundle/vundle/
+call vundle#begin()
+
+Plugin 'gmarik/vundle'
+
+Plugin 'scrooloose/nerdcommenter'
+Plugin 'scrooloose/syntastic'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'xuhdev/SingleCompile'
+Plugin 'Lokaltog/vim-easymotion'
+Plugin 'bling/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+Plugin 'kien/rainbow_parentheses.vim'
+Plugin 'SirVer/ultisnips'
+Plugin 'honza/vim-snippets'
+Plugin 'sophacles/vim-processing'
+Plugin 'vim-scripts/paredit.vim'
+Plugin 'vim-scripts/Gundo'
+Plugin 'idris-hackers/idris-vim'
+"Plugin 'zah/nim.vim'
+Plugin 'bling/vim-bufferline'
+Plugin 'vim-scripts/YankRing.vim'
+Plugin 'tpope/vim-surround'
+Plugin 'rust-lang/rust.vim'
+Plugin 'terryma/vim-multiple-cursors'
+
+call vundle#end()
+filetype plugin indent on
+
+" global options
+
+let g:syntastic_python_checkers=['pyflakes', 'pychecker'] ", 'pylint', 'pep8']
+
+let g:ycm_global_ycm_extra_conf = '/home/marisa/.vim/ycmconf.py'
+
+let g:yankring_history_dir = '~/.vim/yankring'
+
+let g:processing_doc_style = "local"
+let g:processing_doc_path ="/home/marisa/Programming/Processing/modes/java/reference"
+
+let g:tex_flavor="latex"
+call SingleCompile#SetCompilerTemplate('tex', 'xelatex', 'XeLaTeX Typesetter', 'xelatex', '', 'mupdf $(FILE_TITLE)$.pdf')
+call SingleCompile#SetOutfile('tex', 'xelatex', '$(FILE_TITLE)$.pdf')
+call SingleCompile#ChooseCompiler('tex', 'xelatex')
+
+call SingleCompile#SetCompilerTemplate('lua', 'luajit', 'luajit', 'luajit', '', '')
+call SingleCompile#ChooseCompiler('lua', 'luajit')
+
+call SingleCompile#SetCompilerTemplate('scheme', 'racket', 'racket', '/usr/bin/racket', '', '')
+call SingleCompile#ChooseCompiler('scheme', 'racket')
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
