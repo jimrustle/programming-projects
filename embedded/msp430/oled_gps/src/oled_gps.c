@@ -11,6 +11,8 @@
 #include "font.h"
 #include "gps.h"
 
+volatile bool gps_fix = false;
+
 void serial_write_char(char b) {
     while (!(IFG2 & UCA0TXIFG));
     UCA0TXBUF = (unsigned char) b;

@@ -58,6 +58,7 @@ char fmt[]="$GPRMC,dddtdd.ds,A,eeae.eeee,l,eeeae.eeee,o,jdk,c,dddy";
 int state = 0;
 unsigned int t;
 long ltmp;
+extern volatile bool gps_fix;
 
 void parse_GPS (char c) {
   if (c == '$') { state = 0; t = 0; ltmp = 0; }
