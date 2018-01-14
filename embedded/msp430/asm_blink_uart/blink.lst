@@ -10,9 +10,9 @@ Disassembly of section .text:
 0000c004 <main>:
     c004:	b2 40 80 5a 	mov	#23168,	&0x0120	;#0x5a80
     c008:	20 01 
-    c00a:	d2 42 ff 10 	mov.b	&0x10ff,&0x0057	
+    c00a:	d2 42 ff 10 	mov.b	&0x10ff,&0x0057	;0x10ff
     c00e:	57 00 
-    c010:	d2 42 fe 10 	mov.b	&0x10fe,&0x0056	
+    c010:	d2 42 fe 10 	mov.b	&0x10fe,&0x0056	;0x10fe
     c014:	56 00 
     c016:	f2 d0 41 00 	bis.b	#65,	&0x0022	;#0x0041
     c01a:	22 00 
@@ -30,71 +30,77 @@ Disassembly of section .text:
     c03e:	f2 d0 80 00 	bis.b	#128,	&0x0061	;#0x0080
     c042:	61 00 
     c044:	c2 43 63 00 	mov.b	#0,	&0x0063	;r3 As==00
-    c048:	f2 40 06 00 	mov.b	#6,	&0x0062	;#0x0006
+    c048:	f2 40 06 00 	mov.b	#6,	&0x0062	;
     c04c:	62 00 
     c04e:	f2 d0 81 00 	bis.b	#129,	&0x0064	;#0x0081
     c052:	64 00 
     c054:	d2 c3 61 00 	bic.b	#1,	&0x0061	;r3 As==01
-    c058:	f2 d0 06 00 	bis.b	#6,	&0x0026	;#0x0006
+    c058:	f2 d0 06 00 	bis.b	#6,	&0x0026	;
     c05c:	26 00 
-    c05e:	f2 d0 06 00 	bis.b	#6,	&0x0041	;#0x0006
+    c05e:	f2 d0 06 00 	bis.b	#6,	&0x0041	;
     c062:	41 00 
-    c064:	d2 d3 01 00 	bis.b	#1,	&0x0001	;r3 As==01
-    c068:	0e 43       	clr	r14		
+    c064:	f2 d0 01 00 	bis.b	#1,	&0x0001	;
+    c068:	01 00 
+    c06a:	0e 43       	clr	r14		;
 
-0000c06a <sleep>:
-    c06a:	32 d0 d8 00 	bis	#216,	r2	;#0x00d8
-    c06e:	fd 3f       	jmp	$-4      	;abs 0xc06a
+0000c06c <sleep>:
+    c06c:	32 d0 d8 00 	bis	#216,	r2	;#0x00d8
+    c070:	fd 3f       	jmp	$-4      	;abs 0xc06c
 
-0000c070 <send_char>:
-    c070:	e2 b3 03 00 	bit.b	#2,	&0x0003	;r3 As==10
-    c074:	fd 27       	jz	$-4      	;abs 0xc070
-    c076:	c2 4d 67 00 	mov.b	r13,	&0x0067	
-    c07a:	30 41       	ret			
+0000c072 <send_char>:
+    c072:	e2 b3 03 00 	bit.b	#2,	&0x0003	;r3 As==10
+    c076:	fd 27       	jz	$-4      	;abs 0xc072
+    c078:	c2 4d 67 00 	mov.b	r13,	&0x0067	;
+    c07c:	30 41       	ret			
 
-0000c07c <TIMER_A0_VECTOR>:
-    c07c:	d2 e3 21 00 	xor.b	#1,	&0x0021	;r3 As==01
-    c080:	0e 93       	tst	r14		
-    c082:	04 24       	jz	$+10     	;abs 0xc08c
-    c084:	f2 e0 40 00 	xor.b	#64,	&0x0021	;#0x0040
-    c088:	21 00 
-    c08a:	5e 83       	dec.b	r14		
+0000c07e <TIMER_A0_VECTOR>:
+    c07e:	d2 e3 21 00 	xor.b	#1,	&0x0021	;r3 As==01
+    c082:	0e 93       	cmp	#0,	r14	;r3 As==00
+    c084:	04 24       	jz	$+10     	;abs 0xc08e
+    c086:	f2 e0 40 00 	xor.b	#64,	&0x0021	;#0x0040
+    c08a:	21 00 
+    c08c:	5e 83       	dec.b	r14		;
 
-0000c08c <timer_a0_exit>:
-    c08c:	00 13       	reti			
+0000c08e <timer_a0_exit>:
+    c08e:	00 13       	reti			
 
-0000c08e <USCI_A0_VECTOR>:
-    c08e:	f2 e0 40 00 	xor.b	#64,	&0x0021	;#0x0040
-    c092:	21 00 
-    c094:	1f 42 66 00 	mov	&0x0066,r15	
-    c098:	4d 4f       	mov.b	r15,	r13	
-    c09a:	b0 12 70 c0 	call	#0xc070	
-    c09e:	7f 80 30 00 	sub.b	#48,	r15	;#0x0030
-    c0a2:	08 30       	jn	$+18     	;abs 0xc0b4
-    c0a4:	07 24       	jz	$+16     	;abs 0xc0b4
-    c0a6:	3f 90 0a 00 	cmp	#10,	r15	;#0x000a
-    c0aa:	04 2c       	jc	$+10     	;abs 0xc0b4
-    c0ac:	4e 4f       	mov.b	r15,	r14	
-    c0ae:	f2 c0 40 00 	bic.b	#64,	&0x0021	;#0x0040
-    c0b2:	21 00 
+0000c090 <USCI_A0_VECTOR>:
+    c090:	f2 e0 40 00 	xor.b	#64,	&0x0021	;#0x0040
+    c094:	21 00 
+    c096:	1f 42 66 00 	mov	&0x0066,r15	;0x0066
+    c09a:	4d 4f       	mov.b	r15,	r13	;
+    c09c:	b0 12 72 c0 	call	#49266		;#0xc072
+    c0a0:	7f 80 30 00 	sub.b	#48,	r15	;#0x0030
+    c0a4:	08 30       	jn	$+18     	;abs 0xc0b6
+    c0a6:	07 24       	jz	$+16     	;abs 0xc0b6
+    c0a8:	3f 90 0a 00 	cmp	#10,	r15	;#0x000a
+    c0ac:	04 2c       	jc	$+10     	;abs 0xc0b6
+    c0ae:	4e 4f       	mov.b	r15,	r14	;
+    c0b0:	f2 c0 40 00 	bic.b	#64,	&0x0021	;#0x0040
+    c0b4:	21 00 
 
-0000c0b4 <usci_exit>:
-    c0b4:	00 13       	reti			
+0000c0b6 <usci_exit>:
+    c0b6:	00 13       	reti			
 
-0000c0b6 <int_unused>:
-    c0b6:	ff 3f       	jmp	$+0      	;abs 0xc0b6
+0000c0b8 <int_unused>:
+    c0b8:	ff 3f       	jmp	$+0      	;abs 0xc0b8
 
 Disassembly of section .vectors:
 
 0000ffe0 <.vectors>:
-    ffe0:	b6 c0 b6 c0 	bic	#-16202,-16202(r6);#0xc0b6, 0xc0b6(r6)
-    ffe4:	b6 c0 
-    ffe6:	b6 c0 b6 c0 	bic	#-16202,-16202(r6);#0xc0b6, 0xc0b6(r6)
-    ffea:	b6 c0 
-    ffec:	b6 c0 8e c0 	bic	#-16242,-16202(r6);#0xc08e, 0xc0b6(r6)
-    fff0:	b6 c0 
-    fff2:	7c c0 b6 c0 	bic.b	#-16202,r12	;#0xc0b6
-    fff6:	b6 c0 b6 c0 	bic	#-16202,-16202(r6);#0xc0b6, 0xc0b6(r6)
-    fffa:	b6 c0 
-    fffc:	b6 c0 00 c0 	Address 0x0000000000010000 is out of bounds.
-bic	#-16384,-1(r6)	;#0xc000, 0xffff(r6)
+    ffe0:	b8 c0       	interrupt service routine at 0xc0b8
+    ffe2:	b8 c0       	interrupt service routine at 0xc0b8
+    ffe4:	b8 c0       	interrupt service routine at 0xc0b8
+    ffe6:	b8 c0       	interrupt service routine at 0xc0b8
+    ffe8:	b8 c0       	interrupt service routine at 0xc0b8
+    ffea:	b8 c0       	interrupt service routine at 0xc0b8
+    ffec:	b8 c0       	interrupt service routine at 0xc0b8
+    ffee:	90 c0       	interrupt service routine at 0xc090
+    fff0:	b8 c0       	interrupt service routine at 0xc0b8
+    fff2:	7e c0       	interrupt service routine at 0xc07e
+    fff4:	b8 c0       	interrupt service routine at 0xc0b8
+    fff6:	b8 c0       	interrupt service routine at 0xc0b8
+    fff8:	b8 c0       	interrupt service routine at 0xc0b8
+    fffa:	b8 c0       	interrupt service routine at 0xc0b8
+    fffc:	b8 c0       	interrupt service routine at 0xc0b8
+    fffe:	00 c0       	interrupt service routine at 0xc000

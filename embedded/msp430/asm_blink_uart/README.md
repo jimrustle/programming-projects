@@ -11,7 +11,7 @@ Run `make upload` to upload to the MSP430 launchpad.
 
 # Toolchain
 
-Developed using: ``msp430-gcc (GCC) 4.6.3 20120301 (mspgcc LTS 20120406 unpatched)``
+Developed using: ``msp430-elf-gcc (SOMNIUM Technologies Limited - msp430-gcc 6.4.0.32) 6.4.0``
 
 MSP430 Launchpad, with MSP430G2553, make sure you set the `TXD` and `RXD` jumpers horizontally to hardware mode.
 

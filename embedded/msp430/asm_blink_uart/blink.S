@@ -35,8 +35,8 @@ main:
     ; configure 1MHz clock
     ; calibrated values are stored in the infomem segment A,
     ; so we grab the values and store them in the configuration registers for the DCO
-    mov.b &CALBC1_1MHZ_, &BCSCTL1 ; set RSELx
-    mov.b &CALDCO_1MHZ_, &DCOCTL  ; set DCOx and MODx
+    mov.b &CALBC1_1MHZ, &BCSCTL1 ; set RSELx
+    mov.b &CALDCO_1MHZ, &DCOCTL  ; set DCOx and MODx
 
     ; set up port IO
     ; set P1.0 and P1.6 to output
